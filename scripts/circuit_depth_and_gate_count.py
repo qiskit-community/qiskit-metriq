@@ -15,9 +15,12 @@ cx q[4],q[0];
 """
 
 from pyzx import routing
+from qiskit import qiskit
 from qiskit import QuantumCircuit
 from qiskit import transpile
 from qiskit.transpiler import CouplingMap
+
+print("Qiskit version: ", qiskit.__version__)
 
 circuit = QuantumCircuit.from_qasm_str(qasm_in)
 
@@ -28,4 +31,4 @@ for arch in ['ibm_rochester', 'rigetti_16q_aspen']:
 
     # transpile
     result = transpile(circuit, coupling_map=coupling_map, optimization_level=3)
-    print(architecture.name, result.depth(), sum(result.count_ops().values()))
+    print("Architecture:", architecture.name, "- Circuit depth:", result.depth(), "| Gate count:", sum(result.count_ops().values()))
