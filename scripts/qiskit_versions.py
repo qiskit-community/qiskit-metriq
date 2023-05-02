@@ -2,6 +2,9 @@ import requests
 import json
 from datetime import datetime, timedelta
 
+# TODO: add main code to a function that returns filtered_releases
+# and maybe refactor loop logic to look nicer
+
 response = requests.get("https://pypi.org/pypi/qiskit-terra/json")
 data = response.json()
 data_items = data["releases"].items()
@@ -18,7 +21,6 @@ for release, release_info in data_items:
     date_str = release_info[0]["upload_time"]
     # python_version = release_info[0]["requires_python"]
 
-    # TODO: maybe refactor loop logic to look nicer
     # Skip RCs and patch versions
     if "rc" not in release:
         # Skip patch versions
