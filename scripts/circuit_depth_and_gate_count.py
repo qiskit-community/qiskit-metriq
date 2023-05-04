@@ -32,24 +32,25 @@ circuit_depth = []
 gate_count = []
 
 # transpile for each architecture using pyzx
+#TODO: Use constants for arch names
 for arch in ['ibm_rochester', 'rigetti_16q_aspen']:
     architecture = routing.create_architecture(arch)
     coupling_map = CouplingMap(architecture.graph.edges())
     print("Architecture:", architecture.name)
 
+    # TODO: use irange instead
     for i in range(SAMPLE_SIZE):
         # transpile
         result = transpile(circuit, coupling_map=coupling_map, optimization_level=3)
         circuit_depth.append(result.depth())
         gate_count.append(sum(result.count_ops().values()))
-        
+
         # Uncomment the line below to see individual run outputs
         # print("Sample", i+1, "- Circuit depth:", result.depth(), "| Gate count:", sum(result.count_ops().values()))
     
-    if len(circuit_depth) == SAMPLE_SIZE:
-        print("Circuit depth ave:", average(circuit_depth), "| Gate count ave:", average(gate_count), "\n")
-        circuit_depth.clear()
-        gate_count.clear()
+    print("Circuit depth ave:", average(circuit_depth), "| Gate count ave:", average(gate_count), "\n")
+    circuit_depth.clear()
+    gate_count.clear()
 
 '''
 Using SAMPLE_SIZE = 5
