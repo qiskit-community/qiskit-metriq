@@ -2,16 +2,10 @@ import requests
 import json
 from datetime import datetime, timedelta
 
-# TODO: add main code to a function that returns filtered_releases
-# and maybe refactor loop logic to look nicer
-# def _get_runtime_config(runtime_config_name: Optional[str]) -> Optional[Metadata]:
 def get_qiskit_versions_info() -> []:
     response = requests.get("https://pypi.org/pypi/qiskit-terra/json")
     data = response.json()
     data_items = data["releases"].items()
-    # Since Python 3.6 and below have reached end of life
-    # Using 3.7 here as it is compatible with all qiskit-terra versions
-    python_version = "3.7"
 
     # List of objects containing relevant info of each package release, such as:
     # version, date, python version
@@ -20,7 +14,7 @@ def get_qiskit_versions_info() -> []:
     # Filter data
     for release, release_info in data_items:
         date_str = release_info[0]["upload_time"]
-        # python_version = release_info[0]["requires_python"]
+        python_version = release_info[0]["requires_python"]
 
         # Skip RCs and patch versions
         if "rc" not in release:

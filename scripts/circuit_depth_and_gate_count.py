@@ -20,9 +20,12 @@ from qiskit import QuantumCircuit
 from qiskit import transpile
 from qiskit.transpiler import CouplingMap
 
-print("Qiskit version: ", qiskit.__version__, "\n")
-
 SAMPLE_SIZE = 100
+ARCHITECTURES = ['ibm_rochester', 'rigetti_16q_aspen']
+
+print("Qiskit version: ", qiskit.__version__)
+print("Sample size: ", SAMPLE_SIZE)
+print("\n")
 
 def average(lst):
     return sum(lst) / len(lst)
@@ -32,8 +35,7 @@ circuit_depth = []
 gate_count = []
 
 # transpile for each architecture using pyzx
-#TODO: Use constants for arch names
-for arch in ['ibm_rochester', 'rigetti_16q_aspen']:
+for arch in ARCHITECTURES:
     architecture = routing.create_architecture(arch)
     coupling_map = CouplingMap(architecture.graph.edges())
     print("Architecture:", architecture.name)
