@@ -10,36 +10,29 @@ for info in versions_info:
     python_version = "3.7"
     qiskit_version = info["version"]
     env_name = "q_v" + qiskit_version
- 
-    tox_config = """
-[tox]
+    run_task_command = f"python {{toxinidir}}/scripts/circuit_depth_and_gate_count.py"
+    tox_config = f"""[tox]
 minversion = 3.7
-envlist = {}
-
+envlist = {env_name}
 [testenv]
 usedevelop = True
-
 deps =
-qiskit-terra=={}
-requests
-pyzx
-
+    qiskit-terra=={qiskit_version}
+    requests
+    pyzx
 commands = 
-    python {}/scripts/circuit_depth_and_gate_count.py
-""".format(env_name, qiskit_version, "{toxinidir}")
-
-    # Replace tox.ini content
+    {run_task_command}
+"""
     absolute_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
     filename = absolute_path + '/tox.ini'
+    run_tox_command = "tox -vre " + env_name
+
+    print("... Creating tox config file...")
+
     with open(filename, 'w') as f:
         f.write(tox_config)
-
-    command = "tox -re " + env_name
-    os.system(command)
-        # TODO: Fix tox parsing error
-        # configparser.ParsingError: Source contains parsing errors: '/Users/kspuldaro/github/submit-metriq/tox.ini'
-        # [line 11]: '    requests\n'
-        # [line 12]: '    pyzx\n'
+    
+    os.system(run_tox_command)
 
 """
     Ideally, instead of overriding tox.ini content, only override qiskit version using tox CLI.
