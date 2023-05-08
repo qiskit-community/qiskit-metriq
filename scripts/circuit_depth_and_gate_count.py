@@ -25,7 +25,6 @@ ARCHITECTURES = ['ibm_rochester', 'rigetti_16q_aspen']
 
 print("Qiskit version: ", qiskit.__version__)
 print("Sample size: ", SAMPLE_SIZE)
-print("\n")
 
 def average(lst):
     return sum(lst) / len(lst)
@@ -75,4 +74,36 @@ Sample 3 - Circuit depth: 6 | Gate count: 9
 Sample 4 - Circuit depth: 8 | Gate count: 12
 Sample 5 - Circuit depth: 8 | Gate count: 14
 Circuit depth ave: 7.6 | Gate count ave: 11.8
+
+##############################################
+# TODO: Fix error below on earlier qiskit-terra version:
+
+$ python scripts/circuit_depth_and_gate_count.py
+Qiskit version:  0.23.0
+Sample size:  100
+Architecture: ibm_rochester
+Traceback (most recent call last):
+  File "scripts/circuit_depth_and_gate_count.py", line 45, in <module>
+    result = transpile(circuit, coupling_map=coupling_map, optimization_level=3)
+  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/compiler/transpiler.py", line 388, in transpile
+    transpile_config["pass_manager_config"].backend_properties,
+  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/compiler/transpiler.py", line 474, in _serial_transpile_circuit
+    result = pass_manager.run(circuit, callback=callback, output_name=output_name)
+  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/passmanager.py", line 528, in run
+    return super().run(circuits, output_name, callback)
+  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/passmanager.py", line 228, in run
+    return self._run_single_circuit(circuits, output_name, callback)
+  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/passmanager.py", line 283, in _run_single_circuit
+    result = running_passmanager.run(circuit, output_name=output_name, callback=callback)
+  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/runningpassmanager.py", line 125, in run
+    dag = self._do_pass(pass_, dag, passset.options)
+  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/runningpassmanager.py", line 173, in _do_pass
+    dag = self._run_this_pass(pass_, dag)
+  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/runningpassmanager.py", line 202, in _run_this_pass
+    new_dag = pass_.run(dag)
+  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/passes/utils/gate_direction.py", line 299, in run
+    return self._run_coupling_map(dag, layout_map)
+  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/passes/utils/gate_direction.py", line 177, in _run_coupling_map
+    f"Flipping of gate direction is only supported "
+qiskit.transpiler.exceptions.TranspilerError: "Flipping of gate direction is only supported for ['cx', 'cz', 'ecr'] at this time, not 'swap'."
 '''
