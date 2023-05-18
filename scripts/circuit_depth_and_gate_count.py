@@ -23,9 +23,6 @@ from qiskit.transpiler import CouplingMap
 SAMPLE_SIZE = 100
 ARCHITECTURES = ['ibm_rochester', 'rigetti_16q_aspen']
 
-print("Qiskit version: ", qiskit.__version__)
-print("Sample size: ", SAMPLE_SIZE)
-
 def average(lst):
     return sum(lst) / len(lst)
 
@@ -33,12 +30,15 @@ def run_task(output_file_name: str):
   circuit = QuantumCircuit.from_qasm_str(qasm_in)
   circuit_depth = []
   gate_count = []
+  output_file = open(output_file_name, "w")
+  print(f"Qiskit version: {qiskit.__version__}", file=output_file)
+  print(f"Sample size: {SAMPLE_SIZE}\n", file=output_file)
 
   # transpile for each architecture using pyzx
   for arch in ARCHITECTURES:
       architecture = routing.create_architecture(arch)
       coupling_map = CouplingMap(architecture.graph.edges())
-      print("Architecture:", architecture.name)
+      print(f"Architecture: {architecture.name}", file=output_file)
 
       # TODO: use irange instead
       for i in range(SAMPLE_SIZE):
@@ -51,9 +51,17 @@ def run_task(output_file_name: str):
           # print("Sample", i+1, "- Circuit depth:", result.depth(), "| Gate count:", sum(result.count_ops().values()))
       
       # Write to file
-      print("Circuit depth ave:", average(circuit_depth), "| Gate count ave:", average(gate_count), "\n")
+
+      output = "Circuit depth ave:" + str(average(circuit_depth)) + "| Gate count ave:" + str(average(gate_count)) + "\n"
+      print(f"{output}", file=output_file)
+
       circuit_depth.clear()
       gate_count.clear()
+  output_file.close()
+
+# TODO Update the output file format to what is expected from metriq API
+run_task("test_output.txt")
+
 
 '''
 Using SAMPLE_SIZE = 5
