@@ -29,29 +29,31 @@ print("Sample size: ", SAMPLE_SIZE)
 def average(lst):
     return sum(lst) / len(lst)
 
-circuit = QuantumCircuit.from_qasm_str(qasm_in)
-circuit_depth = []
-gate_count = []
+def run_task(output_file_name: str):
+  circuit = QuantumCircuit.from_qasm_str(qasm_in)
+  circuit_depth = []
+  gate_count = []
 
-# transpile for each architecture using pyzx
-for arch in ARCHITECTURES:
-    architecture = routing.create_architecture(arch)
-    coupling_map = CouplingMap(architecture.graph.edges())
-    print("Architecture:", architecture.name)
+  # transpile for each architecture using pyzx
+  for arch in ARCHITECTURES:
+      architecture = routing.create_architecture(arch)
+      coupling_map = CouplingMap(architecture.graph.edges())
+      print("Architecture:", architecture.name)
 
-    # TODO: use irange instead
-    for i in range(SAMPLE_SIZE):
-        # transpile
-        result = transpile(circuit, coupling_map=coupling_map, optimization_level=3, seed_transpiler=i)
-        circuit_depth.append(result.depth())
-        gate_count.append(sum(result.count_ops().values()))
+      # TODO: use irange instead
+      for i in range(SAMPLE_SIZE):
+          # transpile
+          result = transpile(circuit, coupling_map=coupling_map, optimization_level=3, seed_transpiler=i)
+          circuit_depth.append(result.depth())
+          gate_count.append(sum(result.count_ops().values()))
 
-        # Uncomment the line below to see individual run outputs
-        # print("Sample", i+1, "- Circuit depth:", result.depth(), "| Gate count:", sum(result.count_ops().values()))
-    
-    print("Circuit depth ave:", average(circuit_depth), "| Gate count ave:", average(gate_count), "\n")
-    circuit_depth.clear()
-    gate_count.clear()
+          # Uncomment the line below to see individual run outputs
+          # print("Sample", i+1, "- Circuit depth:", result.depth(), "| Gate count:", sum(result.count_ops().values()))
+      
+      # Write to file
+      print("Circuit depth ave:", average(circuit_depth), "| Gate count ave:", average(gate_count), "\n")
+      circuit_depth.clear()
+      gate_count.clear()
 
 '''
 Using SAMPLE_SIZE = 5
