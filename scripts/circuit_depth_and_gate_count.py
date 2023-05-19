@@ -30,6 +30,8 @@ def run_task(output_file_name: str):
   circuit = QuantumCircuit.from_qasm_str(qasm_in)
   circuit_depth = []
   gate_count = []
+
+  # TODO: Add folder structure to these
   output_file = open(output_file_name, "w")
   print(f"Qiskit version: {qiskit.__version__}", file=output_file)
   print(f"Sample size: {SAMPLE_SIZE}\n", file=output_file)
