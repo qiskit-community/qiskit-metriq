@@ -23,12 +23,11 @@ deps =
 commands = 
     {run_task_command}
 """
-    absolute_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
-    filename = absolute_path + '/tox.ini'
+    absolute_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), ".."))
+    filename = absolute_path + "/tox.ini"
     run_tox_command = "tox -vre " + env_name
 
-    print("... Creating tox config file...")
-
+    # Create tox config file
     with open(filename, 'w') as f:
         f.write(tox_config)
     
