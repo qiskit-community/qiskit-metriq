@@ -7,7 +7,7 @@ def get_qiskit_versions_info() -> []:
     data = response.json()
     data_items = data["releases"].items()
 
-    # Release info temporary control dict.
+    # Temporary control dictionary for package release info
     temp = {}
 
     # Filter data
