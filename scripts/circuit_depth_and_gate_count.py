@@ -18,7 +18,7 @@ from pyzx import routing
 from qiskit import qiskit
 from qiskit import QuantumCircuit
 from qiskit import transpile
-from qiskit.transpiler import CouplingMap
+from qiskit.transpiler import CouplingMap, TranspilerError
 
 SAMPLE_SIZE = 100
 ARCHITECTURES = ['ibm_rochester', 'rigetti_16q_aspen']
@@ -42,7 +42,12 @@ for arch in ARCHITECTURES:
     # TODO: use irange instead
     for i in range(SAMPLE_SIZE):
         # transpile
-        result = transpile(circuit, coupling_map=coupling_map, optimization_level=3)
+        try:
+            result = transpile(circuit, coupling_map=coupling_map, optimization_level=3,
+                               seed_transpiler=i)
+        except TranspilerError:
+            result = transpile(circuit, coupling_map=coupling_map, optimization_level=3,
+                               seed_transpiler=i+SAMPLE_SIZE)
         circuit_depth.append(result.depth())
         gate_count.append(sum(result.count_ops().values()))
 
