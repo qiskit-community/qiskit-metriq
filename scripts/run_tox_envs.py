@@ -5,14 +5,14 @@ versions_info = get_qiskit_versions_info()
 
 # Create a tox env for each qiskit version
 for info in versions_info:
-    # Since Python 3.6 and below have reached end of life
-    # Using 3.7 here as it is compatible with all qiskit-terra versions
-    python_version = "3.7"
+    # TODO Pass python version to tox env setup
+    # Using 3.8 for now as it is compatible with all qiskit-terra versions
+    python_version = "3.8"
     qiskit_version = info["version"]
     env_name = "q_v" + qiskit_version
     run_task_command = f"python {{toxinidir}}/scripts/circuit_depth_and_gate_count.py"
     tox_config = f"""[tox]
-minversion = 3.7
+minversion = 3.8
 envlist = {env_name}
 [testenv]
 usedevelop = True
@@ -23,12 +23,11 @@ deps =
 commands = 
     {run_task_command}
 """
-    absolute_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
-    filename = absolute_path + '/tox.ini'
+    absolute_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), ".."))
+    filename = absolute_path + "/tox.ini"
     run_tox_command = "tox -vre " + env_name
 
-    print("... Creating tox config file...")
-
+    # Create tox config file
     with open(filename, 'w') as f:
         f.write(tox_config)
     
@@ -42,5 +41,5 @@ commands =
     # CLI commands tried directly on terminal:
     # tox -e q_0.20.0 -- pip install qiskit-terra==0.20.0
     # tox -e q_0.20.0 --force-dep qiskit-terra==0.20.0
-    # tox -e q_0.20.0 -r --force-dep qiskit==0.20.0
+    # tox -e q_0.20.0 --force-dep qiskit-terra==0.20.0
 """

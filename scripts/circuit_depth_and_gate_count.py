@@ -23,23 +23,25 @@ from qiskit.transpiler import CouplingMap, TranspilerError
 SAMPLE_SIZE = 100
 ARCHITECTURES = ['ibm_rochester', 'rigetti_16q_aspen']
 
-print("Qiskit version: ", qiskit.__version__)
-print("Sample size: ", SAMPLE_SIZE)
-
 def average(lst):
     return sum(lst) / len(lst)
 
-circuit = QuantumCircuit.from_qasm_str(qasm_in)
-circuit_depth = []
-gate_count = []
+def run_task(output_file_name: str):
+  circuit = QuantumCircuit.from_qasm_str(qasm_in)
+  circuit_depth = []
+  gate_count = []
 
-# transpile for each architecture using pyzx
-for arch in ARCHITECTURES:
+  # TODO: Add folder structure to these
+  output_file = open(output_file_name, "w")
+  print(f"Qiskit version: {qiskit.__version__}", file=output_file)
+  print(f"Sample size: {SAMPLE_SIZE}\n", file=output_file)
+
+  # transpile for each architecture using pyzx
+  for arch in ARCHITECTURES:
     architecture = routing.create_architecture(arch)
     coupling_map = CouplingMap(architecture.graph.edges())
-    print("Architecture:", architecture.name)
+    print(f"Architecture: {architecture.name}", file=output_file)
 
-    # TODO: use irange instead
     for i in range(SAMPLE_SIZE):
         # transpile
         result = None
@@ -53,64 +55,53 @@ for arch in ARCHITECTURES:
         circuit_depth.append(result.depth())
         gate_count.append(sum(result.count_ops().values()))
 
-        # Uncomment the line below to see individual run outputs
-        # print("Sample", i+1, "- Circuit depth:", result.depth(), "| Gate count:", sum(result.count_ops().values()))
+      # Uncomment the line below to see individual run outputs
+      # print("Sample", i+1, "- Circuit depth:", result.depth(), "| Gate count:", sum(result.count_ops().values()))
     
-    print("Circuit depth ave:", average(circuit_depth), "| Gate count ave:", average(gate_count), "\n")
+    # Write to file
+    output = "Circuit depth ave:" + str(average(circuit_depth)) + "| Gate count ave:" + str(average(gate_count)) + "\n"
+    print(f"{output}", file=output_file)
+
     circuit_depth.clear()
     gate_count.clear()
+  
+  output_file.close()
+
+# TODO Update the output file format to what is expected from metriq API
+run_task(f"{qiskit.__version__}.txt")
+
 
 '''
-Using SAMPLE_SIZE = 5
+# TODO: Investigate errors using qiskit versions below:
 
-$ python scripts/circuit_depth_and_gate_count.py
-Qiskit version:  0.23.3
+0.13.0,
+0.14.2:
 
-Architecture: ibm_rochester
-Sample 1 - Circuit depth: 9 | Gate count: 13
-Sample 2 - Circuit depth: 9 | Gate count: 13
-Sample 3 - Circuit depth: 10 | Gate count: 16
-Sample 4 - Circuit depth: 10 | Gate count: 17
-Sample 5 - Circuit depth: 12 | Gate count: 23
-Circuit depth ave: 10.0 | Gate count ave: 16.4
+AttributeError: module 'numpy' has no attribute 'float'.
+`np.float` was a deprecated alias for the builtin `float`. To avoid this error in existing code, use `float` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.float64` here.
+The aliases was originally deprecated in NumPy 1.20; for more details and guidance see the original release note at:
+    https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
 
-Architecture: rigetti_16q_aspen
-Sample 1 - Circuit depth: 8 | Gate count: 12
-Sample 2 - Circuit depth: 8 | Gate count: 12
-Sample 3 - Circuit depth: 6 | Gate count: 9
-Sample 4 - Circuit depth: 8 | Gate count: 12
-Sample 5 - Circuit depth: 8 | Gate count: 14
-Circuit depth ave: 7.6 | Gate count ave: 11.8
+---
+0.15.2:
 
-##############################################
-# TODO: Fix error below on earlier qiskit-terra version:
+AttributeError: module 'numpy' has no attribute 'int'.
+`np.int` was a deprecated alias for the builtin `int`. To avoid this error in existing code, use `int` by itself. Doing this will not modify any behavior and is safe. When replacing `np.int`, you may wish to use e.g. `np.int64` or `np.int32` to specify the precision. If you wish to review your current use, check the release note link for additional information.
+The aliases was originally deprecated in NumPy 1.20; for more details and guidance see the original release note at:
+    https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
 
-$ python scripts/circuit_depth_and_gate_count.py
-Qiskit version:  0.23.0
-Sample size:  100
-Architecture: ibm_rochester
-Traceback (most recent call last):
-  File "scripts/circuit_depth_and_gate_count.py", line 45, in <module>
-    result = transpile(circuit, coupling_map=coupling_map, optimization_level=3)
-  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/compiler/transpiler.py", line 388, in transpile
-    transpile_config["pass_manager_config"].backend_properties,
-  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/compiler/transpiler.py", line 474, in _serial_transpile_circuit
-    result = pass_manager.run(circuit, callback=callback, output_name=output_name)
-  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/passmanager.py", line 528, in run
-    return super().run(circuits, output_name, callback)
-  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/passmanager.py", line 228, in run
-    return self._run_single_circuit(circuits, output_name, callback)
-  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/passmanager.py", line 283, in _run_single_circuit
-    result = running_passmanager.run(circuit, output_name=output_name, callback=callback)
-  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/runningpassmanager.py", line 125, in run
-    dag = self._do_pass(pass_, dag, passset.options)
-  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/runningpassmanager.py", line 173, in _do_pass
-    dag = self._run_this_pass(pass_, dag)
-  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/runningpassmanager.py", line 202, in _run_this_pass
-    new_dag = pass_.run(dag)
-  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/passes/utils/gate_direction.py", line 299, in run
-    return self._run_coupling_map(dag, layout_map)
-  File "/Users/kspuldaro/opt/anaconda3/envs/metriq/lib/python3.7/site-packages/qiskit/transpiler/passes/utils/gate_direction.py", line 177, in _run_coupling_map
-    f"Flipping of gate direction is only supported "
+---
+0.19.2
+0.20.2
+0.21.2,
+0.22.4:
+
+raise TranspilerError(
 qiskit.transpiler.exceptions.TranspilerError: "Flipping of gate direction is only supported for ['cx', 'cz', 'ecr'] at this time, not 'swap'."
+
+---
+0.23.3:
+File "/Users/kspuldaro/github/submit-metriq/.tox/q_v0.23.3/lib/python3.8/site-packages/qiskit/transpiler/passes/utils/gate_direction.py", line 186, in _run_coupling_map
+    raise TranspilerError(
+qiskit.transpiler.exceptions.TranspilerError: "'swap' would be supported on '(15, 14)' if the direction were swapped, but no rules are known to do that. ['rzz', 'rxx', 'cz', 'rzx', 'cx', 'ryy', 'swap', 'ecr'] can be automatically flipped."
 '''
