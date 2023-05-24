@@ -42,12 +42,14 @@ for arch in ARCHITECTURES:
     # TODO: use irange instead
     for i in range(SAMPLE_SIZE):
         # transpile
-        try:
-            result = transpile(circuit, coupling_map=coupling_map, optimization_level=3,
-                               seed_transpiler=i)
-        except TranspilerError:
-            result = transpile(circuit, coupling_map=coupling_map, optimization_level=3,
-                               seed_transpiler=i+SAMPLE_SIZE)
+        result = None
+        while result is None:
+            try:
+                result = transpile(circuit, coupling_map=coupling_map, optimization_level=3,
+                                   seed_transpiler=i)
+                # print('seed_transpiler: ', i)
+            except TranspilerError:
+                i += SAMPLE_SIZE
         circuit_depth.append(result.depth())
         gate_count.append(sum(result.count_ops().values()))
 
