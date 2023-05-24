@@ -1,0 +1,4 @@
+Qiskit version: 0.23.3
+Sample size: 100
+
+Architecture: ibm_rochester
