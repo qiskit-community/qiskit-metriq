@@ -18,7 +18,7 @@ from pyzx import routing
 from qiskit import qiskit
 from qiskit import QuantumCircuit
 from qiskit import transpile
-from qiskit.transpiler import CouplingMap
+from qiskit.transpiler import CouplingMap, TranspilerError
 
 SAMPLE_SIZE = 100
 ARCHITECTURES = ['ibm_rochester', 'rigetti_16q_aspen']
@@ -43,10 +43,17 @@ def run_task(output_file_name: str):
     print(f"Architecture: {architecture.name}", file=output_file)
 
     for i in range(SAMPLE_SIZE):
-      # transpile
-      result = transpile(circuit, coupling_map=coupling_map, optimization_level=3, seed_transpiler=i)
-      circuit_depth.append(result.depth())
-      gate_count.append(sum(result.count_ops().values()))
+        # transpile
+        result = None
+        while result is None:
+            try:
+                result = transpile(circuit, coupling_map=coupling_map, optimization_level=3,
+                                   seed_transpiler=i)
+                # print('seed_transpiler: ', i)
+            except TranspilerError:
+                i += SAMPLE_SIZE
+        circuit_depth.append(result.depth())
+        gate_count.append(sum(result.count_ops().values()))
 
       # Uncomment the line below to see individual run outputs
       # print("Sample", i+1, "- Circuit depth:", result.depth(), "| Gate count:", sum(result.count_ops().values()))
