@@ -14,6 +14,7 @@ x q[4];
 cx q[4],q[0];
 """
 
+import os
 from pyzx import routing
 from qiskit import qiskit
 from qiskit import QuantumCircuit
@@ -30,9 +31,8 @@ def run_task(output_file_name: str):
   circuit = QuantumCircuit.from_qasm_str(qasm_in)
   circuit_depth = []
   gate_count = []
-
-  # TODO: Add folder structure to these
-  output_file = open(output_file_name, "w")
+  path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), "..", "results", output_file_name))
+  output_file = open(path, "w")
   print(f"Qiskit version: {qiskit.__version__}", file=output_file)
   print(f"Sample size: {SAMPLE_SIZE}\n", file=output_file)
 
@@ -82,7 +82,7 @@ AttributeError: module 'numpy' has no attribute 'float'.
 The aliases was originally deprecated in NumPy 1.20; for more details and guidance see the original release note at:
     https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
 
----
+----
 0.15.2:
 
 AttributeError: module 'numpy' has no attribute 'int'.
@@ -90,18 +90,4 @@ AttributeError: module 'numpy' has no attribute 'int'.
 The aliases was originally deprecated in NumPy 1.20; for more details and guidance see the original release note at:
     https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
 
----
-0.19.2
-0.20.2
-0.21.2,
-0.22.4:
-
-raise TranspilerError(
-qiskit.transpiler.exceptions.TranspilerError: "Flipping of gate direction is only supported for ['cx', 'cz', 'ecr'] at this time, not 'swap'."
-
----
-0.23.3:
-File "/Users/kspuldaro/github/submit-metriq/.tox/q_v0.23.3/lib/python3.8/site-packages/qiskit/transpiler/passes/utils/gate_direction.py", line 186, in _run_coupling_map
-    raise TranspilerError(
-qiskit.transpiler.exceptions.TranspilerError: "'swap' would be supported on '(15, 14)' if the direction were swapped, but no rules are known to do that. ['rzz', 'rxx', 'cz', 'rzx', 'cx', 'ryy', 'swap', 'ecr'] can be automatically flipped."
 '''
