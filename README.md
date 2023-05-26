@@ -30,8 +30,3 @@ Known `qiskit-terra` versions that fail executing the task:
 * 0.13.0
 * 0.14.2
 * 0.15.2
-* 0.19.2
-* 0.20.2
-* 0.21.2
-* 0.22.4
-* 0.23.3
