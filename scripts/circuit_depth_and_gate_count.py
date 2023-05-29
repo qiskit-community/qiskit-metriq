@@ -71,24 +71,3 @@ def run_task(output_file_name: str):
 # TODO Update the output file format to what is expected from metriq API
 run_task(f"{qiskit.__version__}.txt")
 
-
-'''
-# TODO: Investigate errors using qiskit versions below:
-
-0.13.0,
-0.14.2:
-
-AttributeError: module 'numpy' has no attribute 'float'.
-`np.float` was a deprecated alias for the builtin `float`. To avoid this error in existing code, use `float` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.float64` here.
-The aliases was originally deprecated in NumPy 1.20; for more details and guidance see the original release note at:
-    https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
-
-----
-0.15.2:
-
-AttributeError: module 'numpy' has no attribute 'int'.
-`np.int` was a deprecated alias for the builtin `int`. To avoid this error in existing code, use `int` by itself. Doing this will not modify any behavior and is safe. When replacing `np.int`, you may wish to use e.g. `np.int64` or `np.int32` to specify the precision. If you wish to review your current use, check the release note link for additional information.
-The aliases was originally deprecated in NumPy 1.20; for more details and guidance see the original release note at:
-    https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
-
-'''
