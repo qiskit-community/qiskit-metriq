@@ -24,9 +24,3 @@ To run a specific version of `qiskit-terra`, you can manually update it in the `
 ```bash
 python scripts/run_tox_envs.py
 ```
-
-## Troubleshooting
-Known `qiskit-terra` versions that fail executing the task:
-* 0.13.0
-* 0.14.2
-* 0.15.2
