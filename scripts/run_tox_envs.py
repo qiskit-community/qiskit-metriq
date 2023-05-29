@@ -11,6 +11,7 @@ for info in versions_info:
     qiskit_version = info["version"]
     env_name = "q_v" + qiskit_version
     run_task_command = f"python {{toxinidir}}/scripts/circuit_depth_and_gate_count.py"
+    numpy_version = "numpy==1.19.5"
     tox_config = f"""[tox]
 minversion = 3.8
 envlist = {env_name}
@@ -18,11 +19,12 @@ envlist = {env_name}
 usedevelop = True
 deps =
     qiskit-terra=={qiskit_version}
+    %s
     requests
     pyzx
 commands = 
     {run_task_command}
-"""
+""" %(numpy_version if qiskit_version in ["0.13.0", "0.14.2", "0.15.2"] else "")
     absolute_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), ".."))
     filename = absolute_path + "/tox.ini"
     run_tox_command = "tox -vre " + env_name

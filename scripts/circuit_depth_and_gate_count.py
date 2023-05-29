@@ -51,6 +51,7 @@ def run_task(output_file_name: str):
                                    seed_transpiler=i)
                 # print('seed_transpiler: ', i)
             except TranspilerError:
+                # TODO: save seed value 
                 i += SAMPLE_SIZE
         circuit_depth.append(result.depth())
         gate_count.append(sum(result.count_ops().values()))
