@@ -18,6 +18,10 @@ tox
 ```
 **Note:**
 To run a specific version of `qiskit-terra`, you can manually update it in the `tox.ini` file.
+Versions >=0.13,<=0.15 require numpy<1.20. You can run the tox environments `terra13`, `terra14` or `terra15` as:
+```bash
+tox -e python3.8-terra13
+```
 
 ### Create historical data using previous versions of  `qiskit-terra` since last update to Metriq:
 

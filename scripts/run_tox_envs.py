@@ -11,7 +11,7 @@ for info in versions_info:
     qiskit_version = info["version"]
     env_name = "q_v" + qiskit_version
     run_task_command = f"python {{toxinidir}}/scripts/circuit_depth_and_gate_count.py"
-    numpy_version = "numpy==1.19.5"
+    numpy_version = "numpy<1.20"
     tox_config = f"""[tox]
 minversion = 3.8
 envlist = {env_name}
