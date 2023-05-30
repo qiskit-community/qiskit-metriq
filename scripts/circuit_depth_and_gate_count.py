@@ -14,6 +14,7 @@ x q[4];
 cx q[4],q[0];
 """
 
+import statistics
 from pyzx import routing
 from qiskit import qiskit
 from qiskit import QuantumCircuit
@@ -22,9 +23,6 @@ from qiskit.transpiler import CouplingMap, TranspilerError
 
 SAMPLE_SIZE = 100
 ARCHITECTURES = ['ibm_rochester', 'rigetti_16q_aspen']
-
-def average(lst):
-    return sum(lst) / len(lst)
 
 def run_task(output_file_name: str):
   circuit = QuantumCircuit.from_qasm_str(qasm_in)
@@ -54,12 +52,9 @@ def run_task(output_file_name: str):
                 i += SAMPLE_SIZE
         circuit_depth.append(result.depth())
         gate_count.append(sum(result.count_ops().values()))
-
-      # Uncomment the line below to see individual run outputs
-      # print("Sample", i+1, "- Circuit depth:", result.depth(), "| Gate count:", sum(result.count_ops().values()))
     
     # Write to file
-    output = "Circuit depth ave:" + str(average(circuit_depth)) + "| Gate count ave:" + str(average(gate_count)) + "\n"
+    output = f"Circuit depth - ave: {statistics.mean(circuit_depth)}, std dev: {round(statistics.stdev(circuit_depth), 1)}\nGate count - ave: {statistics.mean(gate_count)}, std dev: {round(statistics.stdev(gate_count), 1)}\n"
     print(f"{output}", file=output_file)
 
     circuit_depth.clear()
@@ -69,39 +64,3 @@ def run_task(output_file_name: str):
 
 # TODO Update the output file format to what is expected from metriq API
 run_task(f"{qiskit.__version__}.txt")
-
-
-'''
-# TODO: Investigate errors using qiskit versions below:
-
-0.13.0,
-0.14.2:
-
-AttributeError: module 'numpy' has no attribute 'float'.
-`np.float` was a deprecated alias for the builtin `float`. To avoid this error in existing code, use `float` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.float64` here.
-The aliases was originally deprecated in NumPy 1.20; for more details and guidance see the original release note at:
-    https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
-
----
-0.15.2:
-
-AttributeError: module 'numpy' has no attribute 'int'.
-`np.int` was a deprecated alias for the builtin `int`. To avoid this error in existing code, use `int` by itself. Doing this will not modify any behavior and is safe. When replacing `np.int`, you may wish to use e.g. `np.int64` or `np.int32` to specify the precision. If you wish to review your current use, check the release note link for additional information.
-The aliases was originally deprecated in NumPy 1.20; for more details and guidance see the original release note at:
-    https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
-
----
-0.19.2
-0.20.2
-0.21.2,
-0.22.4:
-
-raise TranspilerError(
-qiskit.transpiler.exceptions.TranspilerError: "Flipping of gate direction is only supported for ['cx', 'cz', 'ecr'] at this time, not 'swap'."
-
----
-0.23.3:
-File "/Users/kspuldaro/github/submit-metriq/.tox/q_v0.23.3/lib/python3.8/site-packages/qiskit/transpiler/passes/utils/gate_direction.py", line 186, in _run_coupling_map
-    raise TranspilerError(
-qiskit.transpiler.exceptions.TranspilerError: "'swap' would be supported on '(15, 14)' if the direction were swapped, but no rules are known to do that. ['rzz', 'rxx', 'cz', 'rzx', 'cx', 'ryy', 'swap', 'ecr'] can be automatically flipped."
-'''
