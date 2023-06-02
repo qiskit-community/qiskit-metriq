@@ -28,9 +28,8 @@ def run_task(output_file_name: str):
   circuit = QuantumCircuit.from_qasm_str(qasm_in)
   circuit_depth = []
   gate_count = []
-
-  # TODO: Add folder structure to these
-  output_file = open(output_file_name, "w")
+  path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), "..", "results", output_file_name))
+  output_file = open(path, "w")
   print(f"Qiskit version: {qiskit.__version__}", file=output_file)
   print(f"Sample size: {SAMPLE_SIZE}\n", file=output_file)
 
@@ -49,6 +48,7 @@ def run_task(output_file_name: str):
                                    seed_transpiler=i)
                 # print('seed_transpiler: ', i)
             except TranspilerError:
+                # TODO: save seed value 
                 i += SAMPLE_SIZE
         circuit_depth.append(result.depth())
         gate_count.append(sum(result.count_ops().values()))
