@@ -14,6 +14,8 @@ x q[4];
 cx q[4],q[0];
 """
 
+import csv
+import os
 import statistics
 from pyzx import routing
 from qiskit import qiskit
@@ -28,16 +30,19 @@ def run_task(output_file_name: str):
   circuit = QuantumCircuit.from_qasm_str(qasm_in)
   circuit_depth = []
   gate_count = []
+
+  # Setup csv file
   path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), "..", "results", output_file_name))
   output_file = open(path, "w")
-  print(f"Qiskit version: {qiskit.__version__}", file=output_file)
-  print(f"Sample size: {SAMPLE_SIZE}\n", file=output_file)
+  writer = csv.writer(output_file)
+  header = ["name","method_name","qiskit_version","sample_size","platform_name","metric_name","metric_t1","metric_t1_value","metric_t2","metric_t2_value"]
+  writer.writerow(header)
 
   # transpile for each architecture using pyzx
   for arch in ARCHITECTURES:
     architecture = routing.create_architecture(arch)
     coupling_map = CouplingMap(architecture.graph.edges())
-    print(f"Architecture: {architecture.name}", file=output_file)
+    results = ["tket-ex1_226.qasm circuit benchmark","qiskit compilation",qiskit.__version__,SAMPLE_SIZE,architecture.name]
 
     for i in range(SAMPLE_SIZE):
         # transpile
@@ -54,13 +59,16 @@ def run_task(output_file_name: str):
         gate_count.append(sum(result.count_ops().values()))
     
     # Write to file
-    output = f"Circuit depth - ave: {statistics.mean(circuit_depth)}, std dev: {round(statistics.stdev(circuit_depth), 1)}\nGate count - ave: {statistics.mean(gate_count)}, std dev: {round(statistics.stdev(gate_count), 1)}\n"
-    print(f"{output}", file=output_file)
+    r1 = results.copy()
+    r1.extend(["circuit depth","ave",statistics.mean(circuit_depth),"stdev",round(statistics.stdev(circuit_depth),3)])
+    writer.writerow(r1)
+
+    r2 = results.copy()
+    r2.extend(["gate count","ave",statistics.mean(gate_count),"stdev",round(statistics.stdev(gate_count),3)])
+    writer.writerow(r2)
 
     circuit_depth.clear()
     gate_count.clear()
-  
   output_file.close()
 
-# TODO Update the output file format to what is expected from metriq API
-run_task(f"{qiskit.__version__}.txt")
+run_task(f"ex1_226-q{qiskit.__version__}.csv")
