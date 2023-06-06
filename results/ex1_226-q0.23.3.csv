@@ -1,0 +1,5 @@
+name,method_name,qiskit_version,sample_size,platform_name,metric_name,metric_t1,metric_t1_value,metric_t2,metric_t2_value
+tket-ex1_226.qasm circuit benchmark,qiskit compilation,0.23.3,100,ibm_rochester,circuit depth,ave,10.61,stdev,1.639
+tket-ex1_226.qasm circuit benchmark,qiskit compilation,0.23.3,100,ibm_rochester,gate count,ave,16.72,stdev,2.559
+tket-ex1_226.qasm circuit benchmark,qiskit compilation,0.23.3,100,rigetti_16q_aspen,circuit depth,ave,9.12,stdev,1.174
+tket-ex1_226.qasm circuit benchmark,qiskit compilation,0.23.3,100,rigetti_16q_aspen,gate count,ave,15.11,stdev,2.585
