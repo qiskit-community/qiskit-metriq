@@ -13,7 +13,7 @@ for info in versions_info:
     run_task_command = f"python {{toxinidir}}/scripts/circuit_depth_and_gate_count.py"
     numpy_version = "numpy<1.20"
     tox_config = f"""[tox]
-minversion = 3.8
+minversion = {python_version}
 envlist = {env_name}
 [testenv]
 usedevelop = True
