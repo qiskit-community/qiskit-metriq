@@ -22,6 +22,7 @@ from qiskit import qiskit
 from qiskit import QuantumCircuit
 from qiskit import transpile
 from qiskit.transpiler import CouplingMap, TranspilerError
+from qiskit_versions import get_release_date
 
 SAMPLE_SIZE = 100
 ARCHITECTURES = ['ibm_rochester', 'rigetti_16q_aspen']
@@ -35,16 +36,16 @@ def run_task(output_file_name: str):
   path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), "..", "results", output_file_name))
   output_file = open(path, "w")
   writer = csv.writer(output_file)
-
-  # TODO: Include release date
-  header = ["name","method_name","qiskit_version","release_date","sample_size","platform_name","metric_name","metric_value", "seed"]
+  version = qiskit.__version__
+  date = get_release_date(version)
+  header = ["name","method_name","qiskit_version","date","sample_size","platform_name","metric_name","metric_value", "seed"]
   writer.writerow(header)
 
   # Transpile for each architecture using pyzx
   for arch in ARCHITECTURES:
     architecture = routing.create_architecture(arch)
     coupling_map = CouplingMap(architecture.graph.edges())
-    results = ["tket-ex1_226.qasm circuit benchmark","qiskit compilation",qiskit.__version__,"",SAMPLE_SIZE,architecture.name]
+    results = ["tket-ex1_226.qasm circuit benchmark","qiskit compilation",version,date,SAMPLE_SIZE,architecture.name]
 
     for i in range(SAMPLE_SIZE):
         result = None

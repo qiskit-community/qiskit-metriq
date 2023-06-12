@@ -2,12 +2,15 @@ import requests
 import json
 from datetime import datetime
 
-def get_qiskit_versions_info() -> []:
+def get_qiskit_releases_data() -> dict:
     response = requests.get("https://pypi.org/pypi/qiskit-terra/json")
     data = response.json()
-    data_items = data["releases"].items()
+    return data["releases"].items()
 
-    # Temporary control dictionary for package release info
+def get_qiskit_versions_info() -> []:
+    data_items = get_qiskit_releases_data()
+
+    # Temporary control dictionary for package release info for version, date and python version
     temp = {}
 
     # Filter data
@@ -49,10 +52,16 @@ def get_qiskit_versions_info() -> []:
 
     return filtered_releases
 
-# Uncomment lines alone to test this file output on its own
-# versions_info = get_qiskit_versions_info()
-# print('Qiskit Terra versions:')
-# print(*versions_info, sep='\n')
+def get_release_date(input_version:str) -> str:
+    data_items = data_items = get_qiskit_releases_data()
+
+    # Filter data
+    for release, release_info in data_items:
+        if release == input_version:
+            # Remove time from date format "%Y-%m-%dT%H:%M:%S"
+            date_time= release_info[0]["upload_time"]
+            return date_time.split('T', 1)[0]
+    return "Invalid version"
 
 """
 Qiskit Terra versions:
