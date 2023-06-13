@@ -26,6 +26,7 @@ from qiskit_versions import get_release_date
 
 SAMPLE_SIZE = 100
 ARCHITECTURES = ['ibm_rochester', 'rigetti_16q_aspen']
+OPTIMIZATION_LEVEL = 3
 
 def run_task(output_file_name: str):
   circuit = QuantumCircuit.from_qasm_str(ex1_226_qasm_in)
@@ -38,20 +39,20 @@ def run_task(output_file_name: str):
   writer = csv.writer(output_file)
   version = qiskit.__version__
   date = get_release_date(version)
-  header = ["name","method_name","qiskit_version","date","sample_size","platform_name","metric_name","metric_value", "seed"]
+  header = ["name","method_name","qiskit_version","date","platform_name","sample_size","seed","optimization_level","metric_name","metric_value"]
   writer.writerow(header)
 
   # Transpile for each architecture using pyzx
   for arch in ARCHITECTURES:
     architecture = routing.create_architecture(arch)
     coupling_map = CouplingMap(architecture.graph.edges())
-    results = ["tket-ex1_226.qasm circuit benchmark","qiskit compilation",version,date,SAMPLE_SIZE,architecture.name]
+    results = ["ex1_226.qasm circuit benchmark","qiskit compilation",version,date,architecture.name]
 
     for i in range(SAMPLE_SIZE):
         result = None
         while result is None:
             try:
-                result = transpile(circuit, coupling_map=coupling_map, optimization_level=3,
+                result = transpile(circuit, coupling_map=coupling_map, optimization_level=OPTIMIZATION_LEVEL,
                                    seed_transpiler=i)
             except TranspilerError:
                 i += SAMPLE_SIZE
@@ -59,8 +60,8 @@ def run_task(output_file_name: str):
         gates = sum(result.count_ops().values())
 
         # Save to file
-        writer.writerow(results + ["circuit depth",depth,i])
-        writer.writerow(results + ["gate count",gates,i])
+        writer.writerow(results + [SAMPLE_SIZE,i,OPTIMIZATION_LEVEL,"circuit depth",depth])
+        writer.writerow(results + [SAMPLE_SIZE,i,OPTIMIZATION_LEVEL,"gate count",gates])
 
         # Save locally
         circuit_depth.append(depth)
@@ -73,10 +74,10 @@ def run_task(output_file_name: str):
     gate_count_ave = statistics.mean(gate_count)
     gate_count_stdev = round(statistics.stdev(gate_count),3)
 
-    writer.writerow(results + ["circuit depth - ave",depth_ave])
-    writer.writerow(results + ["circuit depth - stdev",depth_stdev])
-    writer.writerow(results + ["gate count - ave",gate_count_ave])
-    writer.writerow(results + ["gate count - stdev",gate_count_stdev])
+    writer.writerow(results + [SAMPLE_SIZE,"","","circuit depth - ave",depth_ave])
+    writer.writerow(results + [SAMPLE_SIZE,"","","circuit depth - stdev",depth_stdev])
+    writer.writerow(results + [SAMPLE_SIZE,"","","gate count - ave",gate_count_ave])
+    writer.writerow(results + [SAMPLE_SIZE,"","","gate count - stdev",gate_count_stdev])
 
     # Reset result lists
     circuit_depth.clear()
