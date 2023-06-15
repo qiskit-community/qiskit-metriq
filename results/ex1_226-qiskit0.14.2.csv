@@ -1,4 +1,4 @@
-name,method_name,qiskit_version,date,platform_name,sample_size,seed,optimization_level,metric_name,metric_value
+name,method,qiskit_version,date,platform,sample_size,seed,optimization_level,metric_name,metric_value
 ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,ibm_rochester,100,0,3,circuit depth,16
 ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,ibm_rochester,100,0,3,gate count,25
 ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,ibm_rochester,100,1,3,circuit depth,16
@@ -199,9 +199,9 @@ ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,ibm_rocheste
 ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,ibm_rochester,100,98,3,gate count,17
 ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,ibm_rochester,100,99,3,circuit depth,15
 ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,ibm_rochester,100,99,3,gate count,26
-ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,ibm_rochester,100,,,circuit depth - ave,12.92
+ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,ibm_rochester,100,,,circuit depth - ave,13
 ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,ibm_rochester,100,,,circuit depth - stdev,2.013
-ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,ibm_rochester,100,,,gate count - ave,20.86
+ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,ibm_rochester,100,,,gate count - ave,21
 ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,ibm_rochester,100,,,gate count - stdev,3.367
 ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,rigetti_16q_aspen,100,0,3,circuit depth,16
 ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,rigetti_16q_aspen,100,0,3,gate count,28
@@ -403,7 +403,7 @@ ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,rigetti_16q_
 ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,rigetti_16q_aspen,100,98,3,gate count,28
 ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,rigetti_16q_aspen,100,99,3,circuit depth,16
 ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,rigetti_16q_aspen,100,99,3,gate count,28
-ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,rigetti_16q_aspen,100,,,circuit depth - ave,17.53
+ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,rigetti_16q_aspen,100,,,circuit depth - ave,18
 ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,rigetti_16q_aspen,100,,,circuit depth - stdev,1.992
-ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,rigetti_16q_aspen,100,,,gate count - ave,29.76
+ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,rigetti_16q_aspen,100,,,gate count - ave,30
 ex1_226.qasm circuit benchmark,qiskit compilation,0.14.2,2020-06-15,rigetti_16q_aspen,100,,,gate count - stdev,3.476

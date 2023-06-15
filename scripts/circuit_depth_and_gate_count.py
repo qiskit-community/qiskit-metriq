@@ -27,6 +27,7 @@ from qiskit_versions import get_release_date
 SAMPLE_SIZE = 100
 ARCHITECTURES = ['ibm_rochester', 'rigetti_16q_aspen']
 OPTIMIZATION_LEVEL = 3
+VERSION = qiskit.__version__
 
 def run_task(output_file_name: str):
   circuit = QuantumCircuit.from_qasm_str(ex1_226_qasm_in)
@@ -37,16 +38,15 @@ def run_task(output_file_name: str):
   path = os.path.abspath(os.path.join(os.path.dirname( __file__ ), "..", "results", output_file_name))
   output_file = open(path, "w")
   writer = csv.writer(output_file)
-  version = qiskit.__version__
-  date = get_release_date(version)
-  header = ["name","method_name","qiskit_version","date","platform_name","sample_size","seed","optimization_level","metric_name","metric_value"]
+  date = get_release_date(VERSION)
+  header = ["name","method","qiskit_version","date","platform","sample_size","seed","optimization_level","metric_name","metric_value"]
   writer.writerow(header)
 
   # Transpile for each architecture using pyzx
   for arch in ARCHITECTURES:
     architecture = routing.create_architecture(arch)
     coupling_map = CouplingMap(architecture.graph.edges())
-    results = ["ex1_226.qasm circuit benchmark","qiskit compilation",version,date,architecture.name]
+    results = ["ex1_226.qasm circuit benchmark","qiskit compilation",VERSION,date,architecture.name]
 
     for i in range(SAMPLE_SIZE):
         result = None
@@ -59,21 +59,21 @@ def run_task(output_file_name: str):
         depth = result.depth()
         gates = sum(result.count_ops().values())
 
-        # Save to file
-        writer.writerow(results + [SAMPLE_SIZE,i,OPTIMIZATION_LEVEL,"circuit depth",depth])
-        writer.writerow(results + [SAMPLE_SIZE,i,OPTIMIZATION_LEVEL,"gate count",gates])
-
         # Save locally
         circuit_depth.append(depth)
         gate_count.append(gates)
 
-    # Save these for benchmark submission
-    # TODO: Move these metrics out of csv and into a post processing csv script
-    depth_ave = statistics.mean(circuit_depth)
+        # Save to file
+        writer.writerow(results + [SAMPLE_SIZE,i,OPTIMIZATION_LEVEL,"circuit depth",depth])
+        writer.writerow(results + [SAMPLE_SIZE,i,OPTIMIZATION_LEVEL,"gate count",gates])
+
+    # Calc ave + stdev
+    depth_ave = round(statistics.mean(circuit_depth))
     depth_stdev = round(statistics.stdev(circuit_depth),3)
-    gate_count_ave = statistics.mean(gate_count)
+    gate_count_ave = round(statistics.mean(gate_count))
     gate_count_stdev = round(statistics.stdev(gate_count),3)
 
+    # Save to file
     writer.writerow(results + [SAMPLE_SIZE,"","","circuit depth - ave",depth_ave])
     writer.writerow(results + [SAMPLE_SIZE,"","","circuit depth - stdev",depth_stdev])
     writer.writerow(results + [SAMPLE_SIZE,"","","gate count - ave",gate_count_ave])
@@ -85,4 +85,4 @@ def run_task(output_file_name: str):
 
   output_file.close()
 
-run_task(f"ex1_226-qiskit{qiskit.__version__}.csv")
+run_task(f"ex1_226-qiskit{VERSION}.csv")
