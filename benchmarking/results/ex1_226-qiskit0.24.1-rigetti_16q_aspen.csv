@@ -1,4 +1,4 @@
-|Qasm file|Method|Date|Opt Level|Platform|Seed|Circuit Depth|Gate count
+|Qasm file|Method|Date|Opt level|Platform|Seed|Circuit depth|Gate count
 0|ex1_226.qasm|Qiskit 0.24.1 compilation|2023-06-02|3|rigetti_16q_aspen|0|8|16
 1|ex1_226.qasm|Qiskit 0.24.1 compilation|2023-06-02|3|rigetti_16q_aspen|1|10|16
 2|ex1_226.qasm|Qiskit 0.24.1 compilation|2023-06-02|3|rigetti_16q_aspen|2|9|13
