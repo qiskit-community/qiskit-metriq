@@ -22,6 +22,7 @@ deps =
     %s
     requests
     pyzx
+    pandas
 commands = 
     {run_task_command}
 """ %(numpy_version if qiskit_version in ["0.13.0", "0.14.2", "0.15.2"] else "")

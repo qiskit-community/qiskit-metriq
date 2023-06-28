@@ -8,7 +8,7 @@ from qiskit import transpile
 from qiskit.transpiler import CouplingMap, TranspilerError
 from qiskit_versions import get_release_date
 
-SAMPLE_SIZE = 10
+SAMPLE_SIZE = 100
 ARCHITECTURES = ["ibm_rochester", "rigetti_16q_aspen"]
 OPTIMIZATION_LEVEL = 3
 VERSION = qiskit.__version__
@@ -38,17 +38,17 @@ def run_task(qasm_id: str):
 
     output_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ),"..","benchmarking","results",f"{qasm_id}-qiskit{VERSION}-{arch}.csv"))
     df.to_csv(output_path, sep="|")
-
-  # TODO: Calc ave + stdev using pandas and store results in a separate file for metriq submission
-  # metriq_results = {
-  #   "Name":[f"{qasm_id}.qasm circuit benchmark"],
-  #   "Method" :[METHOD],
-  #   "Date":[DATE],
-  #   "Sample Size":[SAMPLE_SIZE],
-  #   "Platform":[],
-  #   "Metric Name":[],
-  #   "Metric Value":[],
-  #   "Notes":["Seed:, Version:, Opt Level:"],
-  # }
+    
+    # TODO: Calc ave + stdev using pandas and store results in a separate file for metriq submission
+    # metriq_results = {
+    #   "Name":[f"{qasm_id}.qasm circuit benchmark"],
+    #   "Method" :[METHOD],
+    #   "Date":[DATE],
+    #   "Sample Size":[SAMPLE_SIZE],
+    #   "Platform":[],
+    #   "Metric Name":[],
+    #   "Metric Value":[],
+    #   "Notes":["Seed:, Version:, Opt Level:"],
+    # }
 
 run_task("ex1_226")
