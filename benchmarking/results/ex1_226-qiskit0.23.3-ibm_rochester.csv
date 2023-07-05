@@ -1,4 +1,4 @@
-|Qasm file|Method|Date|Opt Level|Platform|Seed|Circuit Depth|Gate count
+|Qasm file|Method|Date|Opt level|Platform|Seed|Circuit depth|Gate count
 0|ex1_226.qasm|Qiskit 0.23.3 compilation|2023-03-21|3|ibm_rochester|0|11|15
 1|ex1_226.qasm|Qiskit 0.23.3 compilation|2023-03-21|3|ibm_rochester|1|13|21
 2|ex1_226.qasm|Qiskit 0.23.3 compilation|2023-03-21|3|ibm_rochester|2|13|20
