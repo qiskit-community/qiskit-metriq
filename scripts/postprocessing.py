@@ -1,7 +1,8 @@
 
 import os
+# import json
 from metriq import MetriqClient
-from metriq.models.result import ResultCreateRequest
+# from metriq.models.result import ResultCreateRequest
 
 METRIQ_TOKEN = os.getenv("METRIQ_TOKEN")
 
@@ -27,29 +28,36 @@ def process_results():
   # 4. create metriq submission item
   # 5. submit item though metriq API
 
-  # client = MetriqClient(token=METRIQ_TOKEN)
-  # methods = client.method_names_get()
-  # print(*methods, sep = "\n")
+  client = MetriqClient(token=METRIQ_TOKEN)
+  print(client.hello())
 
-  # print(client.task_names_get()) #400: Request validation error
-  # print(client.task_get("26")) #ex1_226.qasm (Aspen) #400: Request validation error
-  # print(client.task_get("27")) #ex1_226.qasm (Rochester) #400: Request validation error
+  # PLATFORM ENDPOINT
+  # client.http.get(f"/platform/") #HttpClientError 200
 
-  # Result attributes from https://github.com/unitaryfund/metriq-client/blob/development/metriq/models/result.py
-  # Create result item
+  # TASK ENDPOINTS
+  # response = client.http.get(f"/task/names/")
+  # print(response["message"])
+  # print(*response["data"], sep = "\n")
+  # {'id': 26, 'name': 'ex1_226.qasm (Aspen)', 'top': 0}
+  # {'id': 27, 'name': 'ex1_226.qasm (Rochester)', 'top': 0}
 
+  # response = client.http.get(f"/task/26/")
+  # print(response["message"])
+  # print(json.dumps(response["data"], indent=4))
+
+  # TODO: Create result item
   # result = ResultCreateRequest()
-  # result.task = "26" #ex1_226.qasm (Aspen)
+  # result.task = "ex1_226.qasm (Aspen)"
+  # result.platform = "Rigetti 16Q Aspen-1"
   # result.method = "Qiskit compilation"
-  # result.metricName = "gate count"
-  # result.metricValue = ""
-  # result.evaluatedAt = ""
-  # result.isHigherBetter = "false"
+  # result.metricName = "Circuit depth"
+  # result.metricValue = 
+  # result.evaluatedAt = "Rigetti 16Q Aspen-1"
+  # result.isHigherBetter = false
   # result.sampleSize = SAMPLE_SIZE
-  # result.notes = f"qiskit-terra version: {VERSION}, optimization level {OPTIMIZATION_LEVEL}, gate count stdev: {gate_count_stdev}"
+  # result.notes = ""
 
   # client.result_add(result)
-  # result = client.result_metric_names()
-  # print(result)
+  # print(client.result_metric_names())
 
 process_results()
