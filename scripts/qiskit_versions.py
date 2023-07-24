@@ -50,9 +50,9 @@ def get_qiskit_versions_info() -> []:
     return filtered_releases
 
 # Uncomment lines alone to test this file output on its own
-# versions_info = get_qiskit_versions_info()
-# print('Qiskit Terra versions:')
-# print(*versions_info, sep='\n')
+versions_info = get_qiskit_versions_info()
+print('Qiskit Terra versions:')
+print(*versions_info, sep='\n')
 
 """
 Qiskit Terra versions:
@@ -67,5 +67,5 @@ Qiskit Terra versions:
 {'version': '0.21.2', 'date': '2022-08-23T21:07:29', 'python_version': '>=3.7'}
 {'version': '0.22.4', 'date': '2023-01-17T13:01:47', 'python_version': '>=3.7'}
 {'version': '0.23.3', 'date': '2023-03-21T19:16:16', 'python_version': '>=3.7'}
-{'version': '0.24.0', 'date': '2023-05-04T19:14:05', 'python_version': '>=3.7'}
+{'version': '0.24.2', 'date': '2023-07-19T18:23:22', 'python_version': '>=3.7'} => TODO: Update v0.24 results using this release
 """
