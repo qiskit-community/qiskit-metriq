@@ -1,9 +1,0 @@
-Qiskit version: 0.19.2
-Sample size: 100
-
-Architecture: ibm_rochester
-Circuit depth ave:11.33| Gate count ave:17.77
-
-Architecture: rigetti_16q_aspen
-Circuit depth ave:10.51| Gate count ave:17.37
-
