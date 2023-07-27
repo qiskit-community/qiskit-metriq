@@ -3,24 +3,29 @@ import os
 # import json
 from metriq import MetriqClient
 # from metriq.models.result import ResultCreateRequest
+from metriq.version import __version__
+print("metriq-client version: ", __version__) #0.1.2
+# from paperswithcode.version import __version__
+# print("paperswithcode version: ", __version__) #0.1.2
+
 
 METRIQ_TOKEN = os.getenv("METRIQ_TOKEN")
+print("token", METRIQ_TOKEN)
 
 def hello_metriq():
   client = MetriqClient(token=METRIQ_TOKEN)
   print(client.hello())
   # >>> {'status': 'API is working', 'message': 'This is the Metriq public REST API.'}
-
 # hello_metriq()
 
 def process_results():
-  folder_path = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "results"))
-  filenames = os.listdir(folder_path)
-  for filename in filenames:
-    with open(os.path.join(folder_path, filename), "r") as file:
-      content = file.read()
-      print(content)
-    print("-" * 25)
+  # folder_path = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "results"))
+  # filenames = os.listdir(folder_path)
+  # for filename in filenames:
+  #   with open(os.path.join(folder_path, filename), "r") as file:
+  #     content = file.read()
+  #     print(content)
+  #   print("-" * 25)
 
   # TODO:
   # 2. compute ave and std for each file (one for each architecture)
@@ -35,12 +40,14 @@ def process_results():
   # client.http.get(f"/platform/") #HttpClientError 200
 
   # TASK ENDPOINTS
+  print(client.task_names_get()) # ValidationError(400: Request validation error.)
+  # print(client.task_get("26")) # ValidationError(400: Request validation error.)
+  # Workaround:
   # response = client.http.get(f"/task/names/")
   # print(response["message"])
   # print(*response["data"], sep = "\n")
   # {'id': 26, 'name': 'ex1_226.qasm (Aspen)', 'top': 0}
   # {'id': 27, 'name': 'ex1_226.qasm (Rochester)', 'top': 0}
-
   # response = client.http.get(f"/task/26/")
   # print(response["message"])
   # print(json.dumps(response["data"], indent=4))
