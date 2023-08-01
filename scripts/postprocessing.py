@@ -1,34 +1,25 @@
 
 import os
-# import json
+import pandas as pd
 from metriq import MetriqClient
 # from metriq.models.result import ResultCreateRequest
-from metriq.version import __version__
-print("metriq-client version: ", __version__) #0.1.2
-# from paperswithcode.version import __version__
-# print("paperswithcode version: ", __version__) #0.1.2
-
 
 METRIQ_TOKEN = os.getenv("METRIQ_TOKEN")
-print("token", METRIQ_TOKEN)
-
-def hello_metriq():
-  client = MetriqClient(token=METRIQ_TOKEN)
-  print(client.hello())
-  # >>> {'status': 'API is working', 'message': 'This is the Metriq public REST API.'}
-# hello_metriq()
+RESULTS_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "results"))
 
 def process_results():
-  # folder_path = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "results"))
-  # filenames = os.listdir(folder_path)
-  # for filename in filenames:
-  #   with open(os.path.join(folder_path, filename), "r") as file:
-  #     content = file.read()
-  #     print(content)
-  #   print("-" * 25)
+  filenames = os.listdir(RESULTS_PATH)
+  for filename in filenames:
+    file_path = os.path.join(RESULTS_PATH, f"{filename}")
+    df = pd.read_csv(file_path)
+    #Get columns
+    # print(df.keys())
+
+    # compute ave and std for each file (one for each architecture)
+    # circuit_depth_mean = df["Circuit depth"].mean() #KeyError: 'Circuit depth'
+    # print("Circuit depth mean: ", circuit_depth_mean)
 
   # TODO:
-  # 2. compute ave and std for each file (one for each architecture)
   # 3. create result item and add to client
   # 4. create metriq submission item
   # 5. submit item though metriq API
@@ -40,17 +31,11 @@ def process_results():
   # client.http.get(f"/platform/") #HttpClientError 200
 
   # TASK ENDPOINTS
-  print(client.task_names_get()) # ValidationError(400: Request validation error.)
-  # print(client.task_get("26")) # ValidationError(400: Request validation error.)
-  # Workaround:
   # response = client.http.get(f"/task/names/")
   # print(response["message"])
   # print(*response["data"], sep = "\n")
   # {'id': 26, 'name': 'ex1_226.qasm (Aspen)', 'top': 0}
   # {'id': 27, 'name': 'ex1_226.qasm (Rochester)', 'top': 0}
-  # response = client.http.get(f"/task/26/")
-  # print(response["message"])
-  # print(json.dumps(response["data"], indent=4))
 
   # TODO: Create result item
   # result = ResultCreateRequest()
