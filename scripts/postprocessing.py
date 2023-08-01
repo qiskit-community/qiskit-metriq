@@ -7,25 +7,28 @@ from metriq import MetriqClient
 METRIQ_TOKEN = os.getenv("METRIQ_TOKEN")
 RESULTS_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "results"))
 
-def process_results():
+def submit_all():
   filenames = os.listdir(RESULTS_PATH)
   for filename in filenames:
     file_path = os.path.join(RESULTS_PATH, f"{filename}")
-    df = pd.read_csv(file_path)
-    #Get columns
-    # print(df.keys())
+    df = pd.read_csv(file_path, sep='|')
+    process_results(df)
 
-    # compute ave and std for each file (one for each architecture)
-    # circuit_depth_mean = df["Circuit depth"].mean() #KeyError: 'Circuit depth'
-    # print("Circuit depth mean: ", circuit_depth_mean)
+def process_results(dataframe):
+  # columns = dataframe.columns.tolist()
+  # print(columns)
+  # Compute ave and std for each file (one for each architecture)
+  circuit_depth_mean = dataframe["Circuit depth"].mean() #KeyError: 'Circuit depth'
+  print("Circuit depth mean: ", circuit_depth_mean)
 
   # TODO:
-  # 3. create result item and add to client
+  # 3. create result item 
+  # 4. add result item client
   # 4. create metriq submission item
   # 5. submit item though metriq API
 
-  client = MetriqClient(token=METRIQ_TOKEN)
-  print(client.hello())
+  # client = MetriqClient(token=METRIQ_TOKEN)
+  # print(client.hello())
 
   # PLATFORM ENDPOINT
   # client.http.get(f"/platform/") #HttpClientError 200
@@ -52,4 +55,4 @@ def process_results():
   # client.result_add(result)
   # print(client.result_metric_names())
 
-process_results()
+submit_all()
