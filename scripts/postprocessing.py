@@ -6,41 +6,37 @@ from metriq import MetriqClient
 
 METRIQ_TOKEN = os.getenv("METRIQ_TOKEN")
 RESULTS_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "results"))
+TASKS = {"25": "ex1_226.qasm", "26": "ex1_226.qasm (Aspen)", "27": "ex1_226.qasm (Rochester)"}
 
-def submit_all():
+def submit_all(task):
   filenames = os.listdir(RESULTS_PATH)
-  for filename in filenames:
-    file_path = os.path.join(RESULTS_PATH, f"{filename}")
-    df = pd.read_csv(file_path, sep='|')
-    process_results(df)
 
-def process_results(dataframe):
-  # columns = dataframe.columns.tolist()
-  # print(columns)
-  # Compute ave and std for each file (one for each architecture)
-  circuit_depth_mean = dataframe["Circuit depth"].mean() #KeyError: 'Circuit depth'
-  print("Circuit depth mean: ", circuit_depth_mean)
+  for filename in filenames:
+    architectures = ["aspen", "rochester"]
+    for arch in architectures:
+      if arch in filename and arch in task.lower():
+        print(arch)
+        file_path = os.path.join(RESULTS_PATH, f"{filename}")
+        df = pd.read_csv(file_path, sep='|')
+        process_results(df, task)
+
+def process_results(dataframe, task):
+  metrics = ["Circuit depth", "Gate count"]
+  for metric in metrics:
+    print(metric,"ave: ", dataframe[metric].mean())
+    print(metric,"std: ", dataframe[metric].std())
+  print("---")
 
   # TODO:
-  # 3. create result item 
-  # 4. add result item client
-  # 4. create metriq submission item
-  # 5. submit item though metriq API
+  # - Gather relevant results from csv
+  # - create result item 
+  # - add result item client
+  # - create metriq submission item
+  # - submit item though metriq API
 
-  # client = MetriqClient(token=METRIQ_TOKEN)
-  # print(client.hello())
-
-  # PLATFORM ENDPOINT
-  # client.http.get(f"/platform/") #HttpClientError 200
-
-  # TASK ENDPOINTS
-  # response = client.http.get(f"/task/names/")
-  # print(response["message"])
-  # print(*response["data"], sep = "\n")
-  # {'id': 26, 'name': 'ex1_226.qasm (Aspen)', 'top': 0}
-  # {'id': 27, 'name': 'ex1_226.qasm (Rochester)', 'top': 0}
-
-  # TODO: Create result item
+  client = MetriqClient(token=METRIQ_TOKEN)
+  print(client.hello())
+  
   # result = ResultCreateRequest()
   # result.task = "ex1_226.qasm (Aspen)"
   # result.platform = "Rigetti 16Q Aspen-1"
@@ -55,4 +51,4 @@ def process_results(dataframe):
   # client.result_add(result)
   # print(client.result_metric_names())
 
-submit_all()
+submit_all(TASKS["26"])
