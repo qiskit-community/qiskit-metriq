@@ -32,7 +32,7 @@ def process_results(dataframe, task):
     result.metricName = metric
     result.metricValue = dataframe[metric].mean()
     result.evaluatedAt = dataframe["Date"].iloc[0]
-    result.isHigherBetter = False
+    result.isHigherBetter = "false"
     # result.sampleSize = len(dataframe.index) object has no field "sampleSize"
 
     # Get extra info and add to notes
