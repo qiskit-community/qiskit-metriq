@@ -2,7 +2,7 @@
 import os
 import pandas as pd
 from metriq import MetriqClient
-# from metriq.models.result import ResultCreateRequest
+from metriq.models.result import ResultCreateRequest
 
 METRIQ_TOKEN = os.getenv("METRIQ_TOKEN")
 RESULTS_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "results"))
@@ -15,40 +15,39 @@ def submit_all(task):
     architectures = ["aspen", "rochester"]
     for arch in architectures:
       if arch in filename and arch in task.lower():
-        print(arch)
         file_path = os.path.join(RESULTS_PATH, f"{filename}")
         df = pd.read_csv(file_path, sep='|')
         process_results(df, task)
 
 def process_results(dataframe, task):
+  client = MetriqClient(token=METRIQ_TOKEN)
+  # print(client.hello())
+
   metrics = ["Circuit depth", "Gate count"]
   for metric in metrics:
-    print(metric,"ave: ", dataframe[metric].mean())
-    print(metric,"std: ", dataframe[metric].std())
-  print("---")
+    result = ResultCreateRequest()
+    result.task = task
+    result.platform = dataframe["Platform"].iloc[0]
+    result.method = "Qiskit compilation"
+    result.metricName = metric
+    result.metricValue = dataframe[metric].mean()
+    result.evaluatedAt = dataframe["Date"].iloc[0]
+    result.isHigherBetter = False
+    # result.sampleSize = len(dataframe.index) object has no field "sampleSize"
+
+    # Get extra info and add to notes
+    sample_size = len(dataframe.index)
+    metric_std = dataframe[metric].std()
+    opt_level = dataframe["Opt level"].iloc[0]
+    version = dataframe["Method"].iloc[0].split(" ")[1]
+    result.notes = f"Stdev: {round(metric_std,3)}, Optimization level:{opt_level}, qiskit-terra version:{version}, sample size: {sample_size}"
 
   # TODO:
-  # - Gather relevant results from csv
-  # - create result item 
   # - add result item client
   # - create metriq submission item
   # - submit item though metriq API
 
-  client = MetriqClient(token=METRIQ_TOKEN)
-  print(client.hello())
-  
-  # result = ResultCreateRequest()
-  # result.task = "ex1_226.qasm (Aspen)"
-  # result.platform = "Rigetti 16Q Aspen-1"
-  # result.method = "Qiskit compilation"
-  # result.metricName = "Circuit depth"
-  # result.metricValue = 
-  # result.evaluatedAt = "Rigetti 16Q Aspen-1"
-  # result.isHigherBetter = false
-  # result.sampleSize = SAMPLE_SIZE
-  # result.notes = ""
-
-  # client.result_add(result)
+  # client.result_add(result) #missing 1 required positional argument: 'submission_id'
   # print(client.result_metric_names())
 
 submit_all(TASKS["26"])
