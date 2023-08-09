@@ -42,28 +42,6 @@ def run_task(qasm_id: str):
     output_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ),"..","benchmarking","results",f"{qasm_id}-qiskit{VERSION}-{arch}.csv"))
     df.to_csv(output_path, sep="|")
 
-    # Calc ave + stdev using pandas and send results for metriq submission
-    # TODO: Move it to a post processing script that reads from generated csv files
-    # metriq_results1 = {
-    #   "Name":[f"{qasm_id}.qasm circuit benchmark"],
-    #   "Method" :[METHOD],
-    #   "Date":[DATE],
-    #   "Sample Size":[SAMPLE_SIZE],
-    #   "Platform":[arch],
-    #   "Metric Name":["Circuit depth"],
-    #   "Metric Value":[round(df["Circuit depth"].mean())],
-    #   "Notes":[f"Seed:{i}, Version:{VERSION}, Opt Level:{OPTIMIZATION_LEVEL}, Stdev: {round(df['Circuit depth'].std(),3)}"]
-    # }
-    # metriq_results2 = {
-    #   "Name":[f"{qasm_id}.qasm circuit benchmark"],
-    #   "Method" :[METHOD],
-    #   "Date":[DATE],
-    #   "Sample Size":[SAMPLE_SIZE],
-    #   "Platform":[arch],
-    #   "Metric Name":["Gate count"],
-    #   "Metric Value":[round(df["Gate count"].mean())],
-    #   "Notes":[f"Seed:{i}, Version:{VERSION}, Opt Level:{OPTIMIZATION_LEVEL}, Stdev: {round(df['Gate count'].std(),3)}"]
-    # }
     print(f"{arch}\n",
           f"- Circuit depth - ave: {round(df['Circuit depth'].mean())} | stdev: {round(df['Circuit depth'].std(),3)}\n",
           f"- Gate count - ave: {round(df['Gate count'].mean())} | stdev: {round(df['Gate count'].std(),3)}")

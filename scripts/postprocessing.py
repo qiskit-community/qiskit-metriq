@@ -14,9 +14,13 @@ METHOD = "Qiskit compilation"
 def submit_all(task_name: str):
   client = MetriqClient(token=METRIQ_TOKEN)
   # print(client.hello())
-  submission = create_submission(client,task_name)
-  filenames = os.listdir(RESULTS_PATH)
 
+  submission = create_submission(client,task_name)
+  submission.tasks = [task_name]
+  submission.methods = [METHOD]
+  submission.tags = ["quantum circuits", "compiler", "compilation", "ibm qiskit"]
+
+  filenames = os.listdir(RESULTS_PATH)
   for filename in filenames:
     architectures = ["aspen", "rochester"]
     for arch in architectures:
@@ -30,12 +34,8 @@ def create_submission(client: MetriqClient, task_name: str) -> Submission:
   submission_req = SubmissionCreateRequest()
   submission_req.name = task_name
   submission_req.contentUrl = CONTENT_URL
-  submission_req.description = f"Qiskit compilation for the {task_name} benchmark circuit"
-  submission_req.tasks = [task_name]
-  submission_req.methods = [METHOD]
-  submission_req.tags = ["quantum circuits", "compiler", "compilation", "ibm qiskit"]
-
-  return client.submission_add(submission_req)
+  submission_req.description = f"Qiskit compilation for {task_name} benchmark circuit"
+  return client.submission_add(submission_req) #tea_client.errors.HttpClientError: HttpClientError(401: Unauthorized)
 
 def process_results(dataframe, task_name: str, client: MetriqClient, submission_id: str):
   metrics = ["Circuit depth", "Gate count"]
@@ -61,3 +61,4 @@ def process_results(dataframe, task_name: str, client: MetriqClient, submission_
     client.result_add(result_item, submission_id)
 
 submit_all(TASKS["26"])
+submit_all(TASKS["27"])
