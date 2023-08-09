@@ -9,6 +9,7 @@ CONTENT_URL = "https://github.com/qiskit-community/submit-metriq"
 METRIQ_TOKEN = os.getenv("METRIQ_TOKEN")
 RESULTS_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "results"))
 TASKS = {"25": "ex1_226.qasm", "26": "ex1_226.qasm (Aspen)", "27": "ex1_226.qasm (Rochester)"}
+METHOD = "Qiskit compilation"
 
 def submit_all(task_name: str):
   client = MetriqClient(token=METRIQ_TOKEN)
@@ -30,9 +31,10 @@ def create_submission(client: MetriqClient, task_name: str) -> Submission:
   submission_req.name = task_name
   submission_req.contentUrl = CONTENT_URL
   submission_req.description = f"Qiskit compilation for the {task_name} benchmark circuit"
+  submission_req.tasks = [task_name]
+  submission_req.methods = [METHOD]
+  submission_req.tags = ["quantum circuits", "compiler", "compilation", "ibm qiskit"]
 
-  #TODO: Add submission tags, tasks and  methods
-  
   return client.submission_add(submission_req)
 
 def process_results(dataframe, task_name: str, client: MetriqClient, submission_id: str):
@@ -41,7 +43,7 @@ def process_results(dataframe, task_name: str, client: MetriqClient, submission_
     result_item = ResultCreateRequest()
     result_item.task = task_name
     result_item.platform = dataframe["Platform"].iloc[0]
-    result_item.method = "Qiskit compilation"
+    result_item.method = METHOD
     result_item.metricName = metric
     result_item.metricValue = round(dataframe[metric].mean())
     result_item.evaluatedAt = dataframe["Date"].iloc[0]
