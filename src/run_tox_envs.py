@@ -10,7 +10,7 @@ for info in versions_info:
     python_version = "3.8"
     qiskit_version = info["version"]
     env_name = "q_v" + qiskit_version
-    run_task_command = f"python {{toxinidir}}/scripts/circuit_depth_and_gate_count.py"
+    run_task_command = f"python {{toxinidir}}/src/circuit_depth_and_gate_count.py"
     numpy_version = "numpy<1.20"
     tox_config = f"""[tox]
 minversion = {python_version}
