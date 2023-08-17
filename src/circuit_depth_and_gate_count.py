@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import statistics
 from pyzx import routing
-from qiskit import qiskit
+import qiskit
 from qiskit import QuantumCircuit
 from qiskit import transpile
 from qiskit.transpiler import CouplingMap, TranspilerError

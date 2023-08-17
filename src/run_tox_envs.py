@@ -37,7 +37,6 @@ deps =
     %s
     pandas
     pyzx
-    qiskit-terra
     requests
     tea-client==0.0.7
     tea-console==0.0.6

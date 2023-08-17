@@ -91,6 +91,6 @@ Qiskit Terra versions:
 {'version': '0.21.2', 'date': '2022-08-23T21:07:29', 'python_version': '>=3.7'}
 {'version': '0.22.4', 'date': '2023-01-17T13:01:47', 'python_version': '>=3.7'}
 {'version': '0.23.3', 'date': '2023-03-21T19:16:16', 'python_version': '>=3.7'}
-{'version': '0.24.2', 'date': '2023-07-19T18:23:22', 'python_version': '>=3.7'} => TODO: Update v0.24 results using this release
+{'version': '0.24.2', 'date': '2023-07-19T18:23:22', 'python_version': '>=3.7'}
 {'version': '0.25.0', 'date': '2023-07-27T22:01:11', 'python_version': '>=3.8'} => TODO: Update v0.25 results using this release
 """
