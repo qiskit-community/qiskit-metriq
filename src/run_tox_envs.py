@@ -1,15 +1,31 @@
 import os
 from qiskit_versions import *
 
-RESULTS_PATH = os.listdir(os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "results")))
+RESULTS_PATH = os.path.abspath(os.path.join(os.path.dirname( __file__ ),"..", "benchmarking", "results"))
+METRIQ_CLIENT_URL = "https://github.com/unitaryfund/metriq-client/tarball/development"
+EXPERIMENT = "circuit_depth_and_gate_count"
 versions_info = get_qiskit_versions_info()
 
+# Check if qiskit_version already has a result
 def search_results(qiskit_version: str):
-    # Check if qiskit_version already has a result
-    for filename in RESULTS_PATH:
+    for filename in os.listdir(RESULTS_PATH):
         if qiskit_version in filename:
             return True
     return False
+
+# Check for matching major-minor version results to be replaced with latest
+def replace_with_latest(qiskit_version: str) -> [str]:
+    replace_files = []
+    for filename in os.listdir(RESULTS_PATH):
+        if "csv" in filename:
+            filename_major_minor_patch = filename.split("-")[1].replace("qiskit","").split(".")
+            input_major_minor_patch = qiskit_version.split(".")
+
+            if (filename_major_minor_patch[0] == input_major_minor_patch[0]
+                and filename_major_minor_patch[1] == input_major_minor_patch[1] 
+                and filename_major_minor_patch[2] < input_major_minor_patch[2]):
+                    replace_files.append(filename)
+    return replace_files
 
 # Create a tox env for each qiskit version
 for info in versions_info:
@@ -18,13 +34,24 @@ for info in versions_info:
     # Skip running the experiment if there are alredy results associated with that version
     if search_results(qiskit_version):
         continue
+    
+    replace_results = replace_with_latest(qiskit_version)
+    if replace_results:
+        for filename in replace_results:
+            # Remove from folder
+            os.remove(os.path.join(RESULTS_PATH,filename))
+        # Update json file
+        write_versions_to_file(versions_info)
 
-    # TODO Pass python version to tox env setup
+    print("\nRun experiment for qiskit-terra version ", qiskit_version,"...\n")
+
+    # TODO Pass python version and qasm file to tox env setup
+
     # Using 3.8 for now as it is compatible with all qiskit-terra versions
     python_version = "3.8"
     env_name = "q_v" + qiskit_version
-    run_experiment_command = f"python {{toxinidir}}/src/circuit_depth_and_gate_count.py"
-    install_metriq_client_command = "pip install --upgrade https://github.com/unitaryfund/metriq-client/tarball/development"
+    run_experiment_command = f"python {{toxinidir}}/src/{{EXPERIMENT}}.py"
+    install_metriq_client_command = f"pip install --upgrade {{METRIQ_CLIENT_URL}}"
     submit_data_command = f"python {{toxinidir}}/src/postprocessing.py"
     numpy_version = "numpy<1.20"
     tox_config = f"""[tox]

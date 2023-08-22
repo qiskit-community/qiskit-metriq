@@ -16,12 +16,10 @@ DATE = get_release_date(VERSION)
 METHOD = f"Qiskit {VERSION} compilation"
 
 def run_task(qasm_id: str):
+  print(f"\nRunning {METHOD} batch on {qasm_id}\n")
+
   qasm_file_path = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking",f"{qasm_id}.qasm"))
   circuit = QuantumCircuit.from_qasm_file(qasm_file_path)
-
-  print(METHOD)
-  print("Sample Size: ",SAMPLE_SIZE)
-
   # Transpile for each architecture using pyzx
   for arch in ARCHITECTURES:
     architecture = routing.create_architecture(arch)
