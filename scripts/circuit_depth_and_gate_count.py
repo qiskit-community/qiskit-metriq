@@ -46,6 +46,4 @@ def run_task(qasm_id: str):
           f"- Circuit depth - ave: {round(df['Circuit depth'].mean())} | stdev: {round(df['Circuit depth'].std(),3)}\n",
           f"- Gate count - ave: {round(df['Gate count'].mean())} | stdev: {round(df['Gate count'].std(),3)}")
 
-# run_task("ex1_226")
-
-print("Hello World")
+run_task("ex1_226")
