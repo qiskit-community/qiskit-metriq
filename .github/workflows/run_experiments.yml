@@ -2,8 +2,7 @@ name: Run benchmark experiments
 
 on:
   schedule:
-    # - cron: '0 0 1 * *' # Schedule to run on the 1st day of each month at 12:00 AM UTC
-    - cron: '0 * * * *' # Schedule to run every hour for now
+    - cron: '0 0 1 * *' # Schedule to run on the 1st day of each month at 12:00 AM UTC
   pull_request: # TODO - Adjust to all
     types:
       - opens
