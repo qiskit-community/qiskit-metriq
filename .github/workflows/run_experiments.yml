@@ -4,6 +4,13 @@ on:
   schedule:
     # - cron: '0 0 1 * *' # Schedule to run on the 1st day of each month at 12:00 AM UTC
     - cron: '0 * * * *' # Schedule to run every hour for now
+  pull_request:
+    types:
+      - openes
+      - synchronize
+  push:
+    branches:
+      - postprocess-automation # TODO - Adjust to main
 
 jobs:
   run_experiments:
