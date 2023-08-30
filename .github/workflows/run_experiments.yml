@@ -4,13 +4,16 @@ on:
   schedule:
     # - cron: '0 0 1 * *' # Schedule to run on the 1st day of each month at 12:00 AM UTC
     - cron: '0 * * * *' # Schedule to run every hour for now
-  pull_request:
+  pull_request: # TODO - Adjust to all
     types:
-      - openes
+      - opens
       - synchronize
   push:
     branches:
-      - postprocess-automation # TODO - Adjust to main
+      - postprocess-automation # TODO - Adjust to all
+
+env:
+  FORCE_COLOR: true
 
 jobs:
   run_experiments:
@@ -18,10 +21,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
       
