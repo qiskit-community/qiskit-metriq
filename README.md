@@ -14,6 +14,23 @@ Benchmark tasks for quantum computer compilers:
     - [Task 26](https://metriq.info/Task/26) - Aspen architecture
     - [Task 27](https://metriq.info/Task/27) - IBMQ Rochester architecture
 
+## Results
+**Circuit depth distribution**
+
+Compiled for the Rigetti 16Q Aspen architecture
+![Circuit depth-Aspen](benchmarking/results/visualizations/boxplot-aspen_depth.png)
+
+Compiled for the IBMQ Rochester architecture
+![Circuit depth-Rochester](benchmarking/results/visualizations/boxplot-rochester_depth.png)
+
+**Gate count distribution**
+
+Compiled for the Rigetti 16Q Aspen architecture
+![Circuit depth-Aspen](benchmarking/results/visualizations/boxplot-aspen_gates.png)
+
+Compiled for the IBMQ Rochester architecture
+![Circuit depth-Rochester](benchmarking/results/visualizations/boxplot-rochester_gates.png)
+
 ## Requirements
 * [tox](https://pypi.org/project/tox/)
 * Python 3.8+

@@ -104,8 +104,3 @@ def process_results(dataframe, client: MetriqClient, task_id: str, method_id: st
 # TODO Get submission ids from client
 # submit_all(TASKS["26"], "661")
 # submit_all(TASKS["27"], "662")
-
-# TODO open issues for API errors below
-# all_methods = client.method_get_names() # ERROR: AttributeError: 'MetriqClient' object has no attribute 'method_get_names'
-# all_platforms = client.platform_get_names() # ERROR: AttributeError: 'MetriqClient' object has no attribute 'platform_get_names'
-# platform "Rigetti 16Q Aspen-1 " has trailing space
