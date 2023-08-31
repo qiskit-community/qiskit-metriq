@@ -1,15 +1,39 @@
-# Circuit benchmark task
+# Qiskit compilation benchmark for Quantum circuits
 
-Execute quantum circuit compilation [benchmark task 25](https://metriq.info/Task/25) and submit performance results for each version of Qiskit to metriq.info.
+Execute quantum circuit compilation [benchmark task 25](https://metriq.info/Task/25) and submit performance results for each version of Qiskit to [metriq.info](https://metriq.info/), a community-driven platform for hosting quantum benchmarks.
 
 ## Archictecture
 
-Tox environments, with different Qiskit versions installed, execute [circuit benchmark tasks](https://github.com/qiskit-community/submit-metriq/blob/main/scripts/circuit_depth_and_gate_count.py), compiled for the `IBM-Q Rochester` and `Rigetti 16Q Aspen-1` architecture platforms.
+This project creates a tox environment for each qiskit-terra version, starting from v0.13.0 to [latest](https://github.com/Qiskit/qiskit/releases).
+
+The benchmark circuit compilation is batch processed, and the results are submitted to [metriq.info](https://metriq.info/).
+
+Benchmark tasks for quantum computer compilers:
+- ex1_226.qasm benchmark circuit
+    - [Task 25](https://metriq.info/Task/25)
+    - [Task 26](https://metriq.info/Task/26) - Aspen architecture
+    - [Task 27](https://metriq.info/Task/27) - IBMQ Rochester architecture
+
+## Results
+**Circuit depth distribution**
+
+Compiled for the Rigetti 16Q Aspen architecture
+![Circuit depth-Aspen](benchmarking/results/visualizations/boxplot-aspen_depth.png)
+
+Compiled for the IBMQ Rochester architecture
+![Circuit depth-Rochester](benchmarking/results/visualizations/boxplot-rochester_depth.png)
+
+**Gate count distribution**
+
+Compiled for the Rigetti 16Q Aspen architecture
+![Circuit depth-Aspen](benchmarking/results/visualizations/boxplot-aspen_gates.png)
+
+Compiled for the IBMQ Rochester architecture
+![Circuit depth-Rochester](benchmarking/results/visualizations/boxplot-rochester_gates.png)
 
 ## Requirements
 * [tox](https://pypi.org/project/tox/)
 * Python 3.8+
-
 
 ## Run locally
 ### To run benchmark task using the current stable version of `qiskit-terra`:
@@ -21,10 +45,4 @@ To run a specific version of `qiskit-terra`, you can manually update it in the `
 Versions >=0.13,<=0.15 require numpy<1.20. You can run the tox environments `terra13`, `terra14` or `terra15` as:
 ```bash
 tox -e py8-terra13
-```
-
-### Create historical data using previous versions of  `qiskit-terra` since last update to Metriq:
-
-```bash
-python scripts/run_tox_envs.py
 ```
