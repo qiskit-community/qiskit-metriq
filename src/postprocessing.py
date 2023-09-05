@@ -8,7 +8,7 @@ from metriq.models.submission import (Submission, SubmissionCreateRequest)
 METRIQ_TOKEN = os.getenv("METRIQ_TOKEN")
 RESULTS_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "results"))
 
-CONTENT_URL = "https://github.com/qiskit-community/submit-metriq"
+CONTENT_URL = "https://github.com/qiskit-community/qiskit-metriq"
 THUMBNAIL_URL = "https://avatars.githubusercontent.com/u/30696987?s=200&v=4"
 
 # Metriq API parameters and associated ids
@@ -16,6 +16,7 @@ METHOD = {"8": "Qiskit compilation"}
 PLATFORMS = {"64": "Rigetti 16Q Aspen-1 ", "69": "ibmq-rochester"}
 TAGS = ["quantum circuits", "compiler", "compilation", "ibm qiskit"]
 TASKS = {"25": "ex1_226.qasm", "26": "ex1_226.qasm (Aspen)", "27": "ex1_226.qasm (Rochester)"}
+SUBMISSIONS = {"595": TASKS["25"],"661": TASKS["26"], "662": TASKS["27"]}
 
 def get_id(param_list: dict, param_name: str) -> str:
   # Return key from value
@@ -28,6 +29,16 @@ def get_platform_id(keywork: str) -> str:
     if norm_keyword in norm_value:
       return key
   return None
+
+def get_submission_results(client: MetriqClient, submission_id: str) -> []:
+  return client.http.get(f"/submission/{submission_id}/")["data"]["results"]
+  # return client.submission_get(submission_id)
+
+def get_qiskit_version_from_result(result_item: dict) -> str:
+  notes = result_item["notes"]
+  # Notes have extra info in the format "Stdev: f, Optimization level:i, qiskit-terra version:x.y.z"
+  # Get substring after last colon
+  return notes.rsplit(":", 1)[1]
 
 # TODO Keep track of results already submitted and prepare automation pipeline
 def submit_all(task_name: str, submission_id: str = None):
@@ -49,7 +60,7 @@ def submit_all(task_name: str, submission_id: str = None):
   for tag in TAGS:
     client.submission_add_tag(submission_id, tag)
 
-  # TODO Find a way to to update params below using the API
+  # TODO Update params below using the API - currently not supported
   # submission.codeUrl
   # submission.platform
   
@@ -89,7 +100,7 @@ def process_results(dataframe, client: MetriqClient, task_id: str, method_id: st
     platform_id = get_platform_id(platform_keyword)
     result_item.platform = platform_id # Must be id
 
-    # TODO: Update sample size
+    # TODO: Update sample size - currently not supported
     # sample_size = len(dataframe.index)
     # result_item.sampleSize = sample_size # ERROR: object has no field "sampleSize"
 
@@ -101,6 +112,10 @@ def process_results(dataframe, client: MetriqClient, task_id: str, method_id: st
 
     client.result_add(result_item, submission_id)
 
-# TODO Get submission ids from client
-# submit_all(TASKS["26"], "661")
-# submit_all(TASKS["27"], "662")
+# submit_all(TASKS["26"], get_id(SUBMISSIONS, TASKS["26"]))
+# submit_all(TASKS["27"], get_id(SUBMISSIONS, TASKS["27"]))
+
+client = MetriqClient(token=METRIQ_TOKEN)
+results = get_submission_results(client, get_id(SUBMISSIONS, TASKS["26"]))
+for res in results:
+  print(get_qiskit_version_from_result(res))
