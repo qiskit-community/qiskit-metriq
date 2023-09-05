@@ -6,17 +6,17 @@ import qiskit
 from qiskit import QuantumCircuit
 from qiskit import transpile
 from qiskit.transpiler import CouplingMap, TranspilerError
-from qiskit_versions import get_release_date
+from qiskit_versions import get_version_date
 
 SAMPLE_SIZE = 100
 ARCHITECTURES = ["ibm_rochester", "rigetti_16q_aspen"]
 OPTIMIZATION_LEVEL = 3
 VERSION = qiskit.__version__
-DATE = get_release_date(VERSION)
+DATE = get_version_date("qiskit", VERSION)
 METHOD = f"Qiskit {VERSION} compilation"
 
 def run_task(qasm_id: str):
-  print(f"\nRunning {METHOD} batch on {qasm_id}\n")
+  print(f"\nRunning {METHOD} for circuit {qasm_id}\n")
 
   qasm_file_path = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking",f"{qasm_id}.qasm"))
   circuit = QuantumCircuit.from_qasm_file(qasm_file_path)
@@ -37,8 +37,8 @@ def run_task(qasm_id: str):
       results = [f"{qasm_id}.qasm", METHOD, DATE, OPTIMIZATION_LEVEL,arch,i,result.depth(),sum(result.count_ops().values())]
       df.loc[len(df)] = results
 
-    output_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ),"..","benchmarking","results",f"{qasm_id}-qiskit{VERSION}-{arch}.csv"))
-    df.to_csv(output_path, sep="|")
+    # output_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ),"..","benchmarking","results",f"{qasm_id}-qiskit{VERSION}-{arch}.csv"))
+    # df.to_csv(output_path, sep="|")
 
     print(f"{arch}\n",
           f"- Circuit depth - ave: {round(df['Circuit depth'].mean())} | stdev: {round(df['Circuit depth'].std(),3)}\n",
