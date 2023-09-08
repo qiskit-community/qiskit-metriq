@@ -76,10 +76,10 @@ def get_version_date(package_name: str, input_version:str) -> str:
             return date_time.split('T', 1)[0]
     return "Invalid version"
 
-qiskit_info = get_qiskit_versions_info()
+# qiskit_info = get_qiskit_versions_info()
 # write_versions_to_file(qiskit_info, "qiskit.json")
-print("qiskit versions:", sep='\n')
-print(*qiskit_info, sep='\n')
+# print("qiskit versions:", sep='\n')
+# print(*qiskit_info, sep='\n')
 """
 qiskit versions:
 {'version': '0.44.1', 'date': '2023-08-17', 'python_version': '>=3.8'}
