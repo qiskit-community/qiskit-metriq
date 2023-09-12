@@ -1,19 +1,11 @@
 
 import os
 from metriq import MetriqClient
-from qiskit_versions import get_qiskit_versions_info
+from qiskit_versions import *
 
 METRIQ_TOKEN = os.getenv("METRIQ_TOKEN")
 TASKS = {"25": "ex1_226.qasm", "26": "ex1_226.qasm (Aspen)", "27": "ex1_226.qasm (Rochester)"}
 SUBMISSIONS = {"595": TASKS["25"],"661": TASKS["26"], "662": TASKS["27"]}
-
-'''
-Pre-processing steps:
-1. Fetch qiskit versions
-2. Fetch metriq results
-3. Compare 1. and 2. and find missing versions to be executed and uploaded
-4. Decide if new result needs to be uploaded or replace an existing
-'''
 
 def get_id(param_list: dict, param_name: str) -> str:
   # Return key from value
@@ -29,16 +21,15 @@ def get_qiskit_version_from_result(result_item: dict) -> str:
   # Get substring after last colon
   return notes.rsplit(":", 1)[1]
 
-# 1. Fetch qiskit versions
-qiskit_versions_data = get_qiskit_versions_info()
-print("qiskit_versions_data:")
-print(qiskit_versions_data)
+# Fetch latest qiskit version
+latest_qiskit_version = find_latest_version(get_qiskit_versions_list())
 
-# 2. Fetch metriq results
+# Fetch metriq results
 client = MetriqClient(token=METRIQ_TOKEN)
 submission_ids = list(SUBMISSIONS.keys())
-qiskit_versions_submitted = {}
 
+# For each metriq submission, keep track of qiskit versions submitted
+qiskit_versions_submitted = {}
 for submission_id in submission_ids:
   results = get_submission_results(client, submission_id)
   submissions = []
@@ -46,15 +37,24 @@ for submission_id in submission_ids:
     submissions.append(get_qiskit_version_from_result(res))
   qiskit_versions_submitted[submission_id] = submissions
 
-print("qiskit_versions_submitted: ")
+# Find qiskit versions to be either added or replaced in metriq
 for key, value in qiskit_versions_submitted.items():
-  print(key, ": ", value)
+  latest_submitted_version = find_latest_version(value)
+  versions_to_be_added = []
+  versions_to_be_replaced = []
 
-# 3. Compare 1. and 2. and find missing versions to be executed and uploaded
-for v_data in qiskit_versions_data:
-  version = v_data["version"]
-  for key, value in qiskit_versions_submitted.items():
-    if version in value:
-      print(f"Version {version} is in submission {key}")
-    else:
-      print(f"Version {version} is not in submission {key}")
+  if latest_qiskit_version == latest_submitted_version:
+    # submission is up to date
+    continue
+
+  if latest_qiskit_version == compare_versions(latest_qiskit_version, latest_submitted_version):
+    versions_to_be_added.append(latest_qiskit_version)
+    if same_minor(latest_qiskit_version, latest_submitted_version):
+      versions_to_be_replaced.append(latest_submitted_version)  
+
+  print("Submission ", key)
+  print("Add results for qiskit versions ", versions_to_be_added)
+  print("Replace results for qiskit versions ", versions_to_be_replaced)
+
+
+

@@ -23,6 +23,49 @@ def get_qiskit_terra_versions_info() -> []:
     # Filter releases starting from 2020-03 (qiskit-terra version 0.13.0)
     return filter_by_date(data_items,2020,3)
 
+def get_qiskit_versions_list() -> []:
+    qiskit_versions_info = get_qiskit_versions_info()
+    versions_only = []
+    for item in qiskit_versions_info:
+        for key, value in item.items():
+            if key == "version":
+                versions_only.append(value)
+    return versions_only
+
+def find_latest_version(versions: []) -> str:
+  if not versions:
+    return ""
+  
+  # Split each version string into a tuple of integers
+  version_tuples = [tuple(map(int, v.split("."))) for v in versions]
+
+  # Sort
+  sorted_versions = sorted(version_tuples, reverse=True)
+
+  # Convert the latest version tuple back to string
+  latest_version = ".".join(map(str, sorted_versions[0]))
+  return latest_version
+
+def compare_versions(version_1:str, version_2: str) -> str:
+    # Split version strings into lists of ints
+    v1 = list(map(int, version_1.split(".")))
+    v2 = list(map(int, version_2.split(".")))
+
+    # Compare
+    for i in range(max(len(v1), len(v2))):
+        n1 = v1[i] if i < len(v1) else 0
+        n2 = v2[i] if i < len(v2) else 0
+        if n1 < n2:
+            return version_2
+        return version_1
+
+def same_minor(version_1: str, version_2: str) -> bool:
+    # Split version strings into lists of ints
+    v1 = list(map(int, version_1.split(".")))
+    v2 = list(map(int, version_2.split(".")))
+
+    return v1[:2] == v2[:2]
+
 def filter_by_date(data_items: dict, y: int, m: int) -> []:
     # Temporary control dictionary for package release info for version, date and python version
     temp = {}
