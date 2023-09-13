@@ -4,6 +4,7 @@ import pandas as pd
 from metriq import MetriqClient
 from metriq.models.result import ResultCreateRequest
 from metriq.models.submission import (Submission, SubmissionCreateRequest)
+from preprocessing import get_submission_results
 
 METRIQ_TOKEN = os.getenv("METRIQ_TOKEN")
 RESULTS_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "results"))
@@ -18,9 +19,9 @@ TAGS = ["quantum circuits", "compiler", "compilation", "ibm qiskit"]
 TASKS = {"25": "ex1_226.qasm", "26": "ex1_226.qasm (Aspen)", "27": "ex1_226.qasm (Rochester)"}
 SUBMISSIONS = {"595": TASKS["25"],"661": TASKS["26"], "662": TASKS["27"]}
 
-def get_id(param_list: dict, param_name: str) -> str:
+def get_id(input_list: dict, input_value: str) -> str:
   # Return key from value
-  return list(param_list.keys())[list(param_list.values()).index(param_name)]
+  return list(input_list.keys())[list(input_list.values()).index(input_value)]
 
 def get_platform_id(keywork: str) -> str:
   norm_keyword = keywork.lower()
@@ -30,17 +31,6 @@ def get_platform_id(keywork: str) -> str:
       return key
   return None
 
-def get_submission_results(client: MetriqClient, submission_id: str) -> []:
-  return client.http.get(f"/submission/{submission_id}/")["data"]["results"]
-  # return client.submission_get(submission_id)
-
-def get_qiskit_version_from_result(result_item: dict) -> str:
-  notes = result_item["notes"]
-  # Notes have extra info in the format "Stdev: f, Optimization level:i, qiskit-terra version:x.y.z"
-  # Get substring after last colon
-  return notes.rsplit(":", 1)[1]
-
-# TODO Keep track of results already submitted and prepare automation pipeline
 def submit_all(task_name: str, submission_id: str = None):
   client = MetriqClient(token=METRIQ_TOKEN)
 
@@ -114,8 +104,3 @@ def process_results(dataframe, client: MetriqClient, task_id: str, method_id: st
 
 # submit_all(TASKS["26"], get_id(SUBMISSIONS, TASKS["26"]))
 # submit_all(TASKS["27"], get_id(SUBMISSIONS, TASKS["27"]))
-
-client = MetriqClient(token=METRIQ_TOKEN)
-results = get_submission_results(client, get_id(SUBMISSIONS, TASKS["26"]))
-for res in results:
-  print(get_qiskit_version_from_result(res))
