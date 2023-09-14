@@ -104,3 +104,5 @@ def process_results(dataframe, client: MetriqClient, task_id: str, method_id: st
 
 # submit_all(TASKS["26"], get_id(SUBMISSIONS, TASKS["26"]))
 # submit_all(TASKS["27"], get_id(SUBMISSIONS, TASKS["27"]))
+submission_id = os.getenv("SUBMISSION_ID")
+print(f"Processing submission {submission_id}...")
