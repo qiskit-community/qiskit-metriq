@@ -36,8 +36,8 @@ for key,value in submissions_filtered_data.items():
         # Set up tox env config
         python_version = "3.8"
         env_name = "qiskit_v" + new_qiskit_version
-        run_experiment_command = f"python {{toxinidir}}/src/{{EXPERIMENT}}.py"
-        install_metriq_client_command = f"pip install --upgrade {{METRIQ_CLIENT_URL}}"
+        run_experiment_command = f"python {{toxinidir}}/src/{EXPERIMENT}.py"
+        install_metriq_client_command = f"pip install --upgrade {METRIQ_CLIENT_URL}"
         submit_data_command = f"python {{toxinidir}}/src/postprocessing.py"
         env_var = submission_id
         commands = [run_experiment_command, install_metriq_client_command, submit_data_command]
