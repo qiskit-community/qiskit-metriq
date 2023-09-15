@@ -38,26 +38,36 @@ def get_platform_id(keywork: str) -> str:
       return key
   return None
 
-def submit(client: MetriqClient, qiskit_version:str, task_name: str, submission_id: str):
-  # Process results and add them to submission
-  filenames = os.listdir(RESULTS_PATH)
+def files_to_be_processed (submission_id: str) -> []:
+  all_filenames = os.listdir(RESULTS_PATH)
+  files_to_processed = []
+  for filename in all_filenames:
+    if VERSION in filename:
+      if submission_id == "595":
+        files_to_processed.append(filename)
+      else:
+        # Filter filenames matching architecture
+        task_name = SUBMISSIONS[submission_id].lower()
+        for arch in ["aspen", "rochester"]:
+          if arch in task_name and arch in filename:
+              files_to_processed.append(filename)
+  return files_to_processed
+
+def submit(client: MetriqClient, submission_id: str):
+  filenames = files_to_be_processed(submission_id)
   for filename in filenames:
-    if qiskit_version in filename:
-      # TODO handle task 25 case - ignore architecture and process all
-      for arch in ["aspen", "rochester"]:
-        if arch in filename and arch in task_name.lower():
-          file_path = os.path.join(RESULTS_PATH, f"{filename}")
-          df = pd.read_csv(file_path, sep='|')
-          task_id = get_id(TASKS, task_name)
-          method_id = get_id(METHOD, "Qiskit compilation")
-          process_results(df, client, task_id, method_id, submission_id)
+    # Process results and add them to existing submission
+    file_path = os.path.join(RESULTS_PATH, f"{filename}")
+    df = pd.read_csv(file_path, sep='|')
+    task_id = get_id(TASKS, SUBMISSIONS[submission_id])
+    method_id = get_id(METHOD, "Qiskit compilation")
+    process_results(df, client, task_id, method_id, submission_id)
 
 def submit_all(client: MetriqClient, task_name: str, submission_id: str = None):
   if not submission_id:
-    create_new_submission(client,task_name)
-  
-  # TODO handle code duplication with submit()
-  # Process results and add them to submission
+    submission_id = create_new_submission(client,task_name)
+
+  # Process results
   filenames = os.listdir(RESULTS_PATH)
   for filename in filenames:
     architectures = ["aspen", "rochester"]
@@ -70,13 +80,14 @@ def submit_all(client: MetriqClient, task_name: str, submission_id: str = None):
         method_id = get_id(METHOD, "Qiskit compilation")
         process_results(df, client, task_id, method_id, submission_id)
 
-def create_new_submission(client: MetriqClient, task_name: str):
+def create_new_submission(client: MetriqClient, task_name: str) -> str:
   submission_req = SubmissionCreateRequest()
   submission_req.name = task_name
   submission_req.contentUrl = CONTENT_URL
   submission_req.thumbnailUrl = THUMBNAIL_URL
   submission_req.description = f"Qiskit compilation for {task_name} benchmark circuit"
-  client.submission_add(submission_req)
+
+  submission_id = client.submission_add(submission_req)["id"]
   # Populate other submission parameters
   # Task
   client.submission_add_task(submission_id, get_id(TASKS, task_name))
@@ -88,6 +99,7 @@ def create_new_submission(client: MetriqClient, task_name: str):
   # TODO Update params below using the API - currently not supported
   # submission.codeUrl
   # submission.platform
+  return submission_id
 
 def process_results(dataframe, client: MetriqClient, task_id: str, method_id: str, submission_id: str):
   metrics = ["Circuit depth", "Gate count"]
@@ -122,4 +134,5 @@ def process_results(dataframe, client: MetriqClient, task_id: str, method_id: st
 submission_id = os.getenv("SUBMISSION_ID")
 print(f"Processing submission {submission_id}...")
 client = MetriqClient(token=METRIQ_TOKEN)
-submit(client, VERSION, SUBMISSIONS[submission_id], submission_id)
+submit(client, submission_id)
+
