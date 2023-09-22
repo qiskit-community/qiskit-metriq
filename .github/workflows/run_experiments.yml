@@ -3,13 +3,6 @@ name: Run benchmark experiments and submit results to metriq.info
 on:
   schedule:
     - cron: '0 0 1 * *' # Schedule to run on the 1st day of each month at 12:00 AM UTC
-  pull_request:
-    types:
-      - opens
-      - synchronize
-  push:
-    branches:
-      - postprocess-automation # TODO - Adjust to main
 
 env:
   FORCE_COLOR: true
