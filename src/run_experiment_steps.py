@@ -30,10 +30,9 @@ for key,value in submissions_filtered_data.items():
         delete_submission_results(submission_id, r_version)
 
     for new_qiskit_version in add_versions:
-        print(f"Starting setup for experiment run on qiskit version {new_qiskit_version}...")
         # Run experiment and submit results to metriq
-
         # Set up tox env config
+        print(f"Starting setup for experiment run on qiskit version {new_qiskit_version}...")
         python_version = "3.8"
         env_name = "qiskit_v" + new_qiskit_version
         run_experiment_command = f"python {{toxinidir}}/src/{EXPERIMENT}.py"

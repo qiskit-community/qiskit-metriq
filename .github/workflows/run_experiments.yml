@@ -1,22 +1,25 @@
-name: Run benchmark experiments
+name: Run benchmark experiments and submit results to metriq.info
 
 on:
   schedule:
     - cron: '0 0 1 * *' # Schedule to run on the 1st day of each month at 12:00 AM UTC
-  pull_request: # TODO - Adjust to all
+  pull_request:
     types:
       - opens
       - synchronize
   push:
     branches:
-      - postprocess-automation # TODO - Adjust to all
+      - postprocess-automation # TODO - Adjust to main
 
 env:
   FORCE_COLOR: true
 
 jobs:
-  run_experiments:
+  run_experiment_steps:
     runs-on: ubuntu-latest
+
+    env:
+      METRIQ_TOKEN: ${{ secrets.METRIQ_TOKEN}}
 
     steps:
       - name: Checkout code
@@ -28,7 +31,27 @@ jobs:
           python-version: 3.8
       
       - name: Install tox
-        run: pip install tox
-      
-      - name: Run tox
-        run: tox -e py38
+        run: pip install tox 
+
+      - name: Run experiment steps in tox
+        run: tox -ve py38
+
+      # TODO: Create Github Bot account
+      # - name: Configure Git with Bot Git Config
+      #   run: |
+      #     git config user.name "${{ secrets.BOT_USERNAME }}"
+      #     git config user.email "${{ secrets.BOT_EMAIL }}"
+
+      # - name: Check for new CSV files and commit with Bot user
+      #   run: |
+      #     untracked_csv_files=$(find ./benchmarking/results/ -name '*.csv' -type f)
+      #     if [ -n "$untracked_csv_files" ]; then
+      #       git add $untracked_csv_files
+      #       git commit -m "Add new result files"
+      #       git push -u origin main
+      #     fi
+      #   env:
+      #     BOT_USERNAME: ${{ secrets.BOT_USERNAME }}
+      #     BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
+      #     BOT_PAT: ${{ secrets.BOT_PAT}}
+
