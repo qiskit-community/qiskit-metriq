@@ -4,10 +4,11 @@ import pandas as pd
 from metriq import MetriqClient
 from metriq.models.result import ResultCreateRequest
 from metriq.models.submission import (Submission, SubmissionCreateRequest)
+from qiskit_versions import *
 
 METRIQ_TOKEN = os.getenv("METRIQ_TOKEN")
 RESULTS_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "results"))
-
+ARCHITECTURES = ["ibm_rochester", "rigetti_16q_aspen"]
 CONTENT_URL = "https://github.com/qiskit-community/submit-metriq"
 THUMBNAIL_URL = "https://avatars.githubusercontent.com/u/30696987?s=200&v=4"
 
@@ -100,6 +101,52 @@ def process_results(dataframe, client: MetriqClient, task_id: str, method_id: st
     result_item.notes = f"Stdev: {round(metric_std,3)}, Optimization level:{opt_level}, qiskit-terra version:{version}"
 
     client.result_add(result_item, submission_id)
+
+def evaluate_metrics(qiskit_version: str):
+  metrics = ["Circuit depth", "Gate count"]
+  processed_summary = {}
+
+  # Process results and save to file
+  filenames = os.listdir(RESULTS_PATH)
+  for filename in filenames:
+    if qiskit_version in filename:
+      for arch in ARCHITECTURES:
+        if arch in filename:
+          file_path = os.path.join(RESULTS_PATH, f"{filename}")
+          df = pd.read_csv(file_path, sep='|')
+          obj_key = qiskit_version + "-" + arch
+          processed_summary[obj_key] = []
+          
+          for metric in metrics:
+            col = df[metric]
+            mean = col.mean()
+            stdev = col.std()
+            stderr = col.sem()
+
+            processed_summary[obj_key].append(
+              {metric: 
+                {"ave": mean, 
+                "stdev": round(stdev,3), 
+                "stderr": round(stderr,3)}
+              })
+  json_file_path = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "processed_data_summary.json"))
+  append_to_json_file(json_file_path, processed_summary)
+
+def append_to_json_file(json_file_path, processed_info):
+  try:
+    with open(json_file_path, "r") as f:
+      data = json.load(f)
+  except json.JSONDecodeError:
+      data = []
+
+  data.append(processed_info)
+  with open(json_file_path, "w") as f:
+    json.dump(data, f, indent=4)
+
+# versions_info = get_qiskit_versions_info()
+# for info in versions_info:
+#     qiskit_version = info["version"]
+#     evaluate_metrics(qiskit_version)
 
 # TODO Get submission ids from client
 # submit_all(TASKS["26"], "661")
