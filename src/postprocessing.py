@@ -9,7 +9,7 @@ from qiskit_versions import *
 METRIQ_TOKEN = os.getenv("METRIQ_TOKEN")
 RESULTS_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "results"))
 ARCHITECTURES = ["ibm_rochester", "rigetti_16q_aspen"]
-CONTENT_URL = "https://github.com/qiskit-community/submit-metriq"
+CONTENT_URL = "https://github.com/qiskit-community/qiskit-metriq"
 THUMBNAIL_URL = "https://avatars.githubusercontent.com/u/30696987?s=200&v=4"
 
 # Metriq API parameters and associated ids
@@ -17,6 +17,15 @@ METHOD = {"8": "Qiskit compilation"}
 PLATFORMS = {"64": "Rigetti 16Q Aspen-1 ", "69": "ibmq-rochester"}
 TAGS = ["quantum circuits", "compiler", "compilation", "ibm qiskit"]
 TASKS = {"25": "ex1_226.qasm", "26": "ex1_226.qasm (Aspen)", "27": "ex1_226.qasm (Rochester)"}
+
+def get_substring_between_parentheses(input_str: str) -> str:
+  start = input_str.find("(")
+  end = input_str.find(")")
+  if start != -1 and end != -1:
+    substring = input_str[start +1: end]
+    return substring
+  else:
+    return None
 
 def get_id(param_list: dict, param_name: str) -> str:
   # Return key from value
@@ -49,10 +58,6 @@ def submit_all(task_name: str, submission_id: str = None):
   # Tags
   for tag in TAGS:
     client.submission_add_tag(submission_id, tag)
-
-  # TODO Find a way to to update params below using the API
-  # submission.codeUrl
-  # submission.platform
   
   # Process results and add them to submission
   filenames = os.listdir(RESULTS_PATH)
@@ -71,6 +76,10 @@ def create_new_submission(client: MetriqClient, task_name: str):
   submission_req.contentUrl = CONTENT_URL
   submission_req.thumbnailUrl = THUMBNAIL_URL
   submission_req.description = f"Qiskit compilation for {task_name} benchmark circuit"
+  submission_req.codeUrl = CONTENT_URL
+  platform_keyword = get_substring_between_parentheses(task_name)
+  platform_id = get_platform_id(platform_keyword)
+  submission_req.platform = platform_id
   client.submission_add(submission_req)
 
 def process_results(dataframe, client: MetriqClient, task_id: str, method_id: str, submission_id: str):
@@ -80,7 +89,7 @@ def process_results(dataframe, client: MetriqClient, task_id: str, method_id: st
     result_item.task = task_id # Must be id
     result_item.method = method_id # Must be id
     result_item.metricName = metric
-    result_item.metricValue = str(round(dataframe[metric].mean())) # Must be a string
+    result_item.metricValue = str(round(dataframe[metric].mean(),3)) # Must be a string
     result_item.evaluatedAt = dataframe["Date"].iloc[0]
     result_item.isHigherBetter = "false"
 
@@ -90,9 +99,10 @@ def process_results(dataframe, client: MetriqClient, task_id: str, method_id: st
     platform_id = get_platform_id(platform_keyword)
     result_item.platform = platform_id # Must be id
 
-    # TODO: Update sample size
-    # sample_size = len(dataframe.index)
-    # result_item.sampleSize = sample_size # ERROR: object has no field "sampleSize"
+    sample_size = len(dataframe.index)
+    result_item.sampleSize = sample_size
+    std_err = dataframe[metric].sem()
+    result_item.standardError = str(round(std_err, 3)) # Must be a string
 
     # Get extra info and add to notes
     metric_std = dataframe[metric].std()
@@ -102,7 +112,7 @@ def process_results(dataframe, client: MetriqClient, task_id: str, method_id: st
 
     client.result_add(result_item, submission_id)
 
-def evaluate_metrics(qiskit_version: str):
+def evaluate_metrics(qiskit_version: str) -> dict:
   metrics = ["Circuit depth", "Gate count"]
   processed_summary = {}
 
@@ -129,8 +139,7 @@ def evaluate_metrics(qiskit_version: str):
                 "stdev": round(stdev,3), 
                 "stderr": round(stderr,3)}
               })
-  json_file_path = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "processed_data_summary.json"))
-  append_to_json_file(json_file_path, processed_summary)
+  return processed_summary
 
 def append_to_json_file(json_file_path, processed_info):
   try:
@@ -138,15 +147,19 @@ def append_to_json_file(json_file_path, processed_info):
       data = json.load(f)
   except json.JSONDecodeError:
       data = []
-
   data.append(processed_info)
   with open(json_file_path, "w") as f:
     json.dump(data, f, indent=4)
 
-# versions_info = get_qiskit_versions_info()
-# for info in versions_info:
-#     qiskit_version = info["version"]
-#     evaluate_metrics(qiskit_version)
+def create_processed_data_summary():
+  versions_info = get_qiskit_versions_info()
+  for info in versions_info:
+      qiskit_version = info["version"]
+      processed_summary = evaluate_metrics(qiskit_version)
+      json_file_path = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "processed_data_summary.json"))
+      append_to_json_file(json_file_path, processed_summary)
+
+# create_processed_data_summary()
 
 # TODO Get submission ids from client
 # submit_all(TASKS["26"], "661")
