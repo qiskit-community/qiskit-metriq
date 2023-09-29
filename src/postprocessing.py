@@ -76,22 +76,9 @@ def submit(client: MetriqClient, submission_id: str):
 
 def submit_all(client: MetriqClient, task_name: str, submission_id: str = None):
   if not submission_id:
-    create_new_submission(client,task_name)
-
-  # Populate submission parameters
-  # Task
-  task_id = get_id(TASKS, task_name)
-  client.submission_add_task(submission_id, task_id)
-
-  # Method
-  method_id = get_id(METHOD, "Qiskit compilation")
-  client.submission_add_method(submission_id, method_id)
-
-  # Tags
-  for tag in TAGS:
-    client.submission_add_tag(submission_id, tag)
+    submission_id = create_new_submission(client,task_name)
   
-  # Process results and add them to submission
+  # Process results
   filenames = os.listdir(RESULTS_PATH)
   for filename in filenames:
     architectures = ["aspen", "rochester"]
