@@ -19,6 +19,7 @@ CONTENT_URL = "https://github.com/qiskit-community/qiskit-metriq"
 METRICS = ["Circuit depth", "Gate count"]
 METRIQ_TOKEN = os.getenv("METRIQ_TOKEN")
 RESULTS_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "results"))
+SUMMARY_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "processed_data_summary.json"))
 THUMBNAIL_URL = "https://avatars.githubusercontent.com/u/30696987?s=200&v=4"
 
 # Metriq API parameters and associated ids
@@ -171,28 +172,40 @@ def evaluate_metrics(qiskit_version: str) -> dict:
               })
   return processed_summary
 
-def append_to_json_file(json_file_path, processed_info):
+def append_to_json_file(json_file_path: str, processed_info: dict, version: str):
   try:
     with open(json_file_path, "r") as f:
       data = json.load(f)
   except json.JSONDecodeError:
       data = []
-  data.append(processed_info)
-  with open(json_file_path, "w") as f:
-    json.dump(data, f, indent=4)
+
+  # Check if version exists in file
+  v_in_file = any(version in item for item in data)
+  
+  # Only write to file if version is not in file
+  if not v_in_file:
+    data.append(processed_info)
+    with open(json_file_path, "w") as f:
+      json.dump(data, f, indent=4)
+    print(f"Summary for version '{version}' added to file.")
+  else:
+    print(f"Summary for version '{version}' is already in file.")
 
 def create_processed_data_summary():
   versions_info = get_qiskit_versions_info()
   for info in versions_info:
       qiskit_version = info["version"]
       processed_summary = evaluate_metrics(qiskit_version)
-      json_file_path = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "processed_data_summary.json"))
-      append_to_json_file(json_file_path, processed_summary)
+      append_to_json_file(SUMMARY_PATH, processed_summary, qiskit_version)
 
 # create_processed_data_summary()
 
+# Process data
+processed_summary = evaluate_metrics(VERSION)
+append_to_json_file(SUMMARY_PATH, processed_summary, VERSION)
+
+# Submit to Metriq.info
 submission_id = os.getenv("SUBMISSION_ID")
 print(f"Processing submission {submission_id}...")
 client = MetriqClient(token=METRIQ_TOKEN)
 submit(client, submission_id)
-
