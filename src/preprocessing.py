@@ -1,4 +1,3 @@
-
 import os
 from metriq import MetriqClient
 from qiskit_versions import *
@@ -17,7 +16,7 @@ def get_qiskit_version_from_result(result_item: dict) -> str:
   # Get substring after last colon
   return notes.rsplit(":", 1)[1]
 
-def get_submissions_filtered_data() -> {}:
+def get_submissions_update_info() -> {}:
   # Fetch latest qiskit version
   latest_qiskit_version = find_latest_version(get_qiskit_versions_list())
 
@@ -34,9 +33,9 @@ def get_submissions_filtered_data() -> {}:
       submissions.append(get_qiskit_version_from_result(res))
     qiskit_versions_submitted[submission_id] = submissions
 
-  submissions_filtered_data = {}
+  submissions_update_info = {}
 
-  # Find qiskit versions to be either added or replaced in metriq
+  # Find new qiskit versions to be either added or replaced in metriq
   for key, value in qiskit_versions_submitted.items():
     latest_submitted_version = find_latest_version(value)
     versions_to_be_added = []
@@ -51,9 +50,9 @@ def get_submissions_filtered_data() -> {}:
       if same_minor(latest_qiskit_version, latest_submitted_version):
         versions_to_be_replaced.append(latest_submitted_version)  
 
-    submissions_filtered_data[key] = {"add": versions_to_be_added, "replace": versions_to_be_replaced}
+    submissions_update_info[key] = {"add": versions_to_be_added, "replace": versions_to_be_replaced}
   
-  return submissions_filtered_data
+  return submissions_update_info
 
 def delete_submission_results(submission_id: str, qiskit_version: str):
   client = MetriqClient(token=METRIQ_TOKEN)

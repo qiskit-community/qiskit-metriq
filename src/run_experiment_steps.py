@@ -1,38 +1,39 @@
 import os
-from preprocessing import get_submissions_filtered_data, delete_submission_results
+from preprocessing import get_submissions_update_info, delete_submission_results
 from env_setup import create_tox_config_file
 
 RESULTS_PATH = os.path.abspath(os.path.join(os.path.dirname( __file__ ),"..", "benchmarking", "results"))
 METRIQ_CLIENT_URL = "https://github.com/unitaryfund/metriq-client/tarball/development"
 EXPERIMENT = "circuit_depth_and_gate_count"
 
-def get_result_files(qiskit_version: str) -> [str]:
+def get_csv_files(qiskit_version: str) -> [str]:
     matching_files = []
     for filename in os.listdir(RESULTS_PATH):
         if "csv" in filename and qiskit_version in filename:
             matching_files.append(filename)
     return matching_files
 
-# Get filtered data from submissions 
-submissions_filtered_data = get_submissions_filtered_data()
+# Get summary of qiskit versions to be updated in metriq submissions
+submissions_update_info = get_submissions_update_info()
 
-for key,value in submissions_filtered_data.items():
+for key,value in submissions_update_info.items():
     submission_id = key
     add_versions = value["add"]
     replace_versions = value["replace"]
 
-    for r_version in replace_versions:
-        # Delete csv results linked to r_version
-        files_to_be_deleted = get_result_files(r_version)
+    for replace_version in replace_versions:
+        print(f"Replacing qiskit version {replace_version} results...")
+        # Delete local csv results linked to replace_version
+        files_to_be_deleted = get_csv_files(replace_version)
         for filename in files_to_be_deleted:
             os.remove(os.path.join(RESULTS_PATH,filename))
-        # Delete result items linked to r_version from submission
-        delete_submission_results(submission_id, r_version)
+        # Delete result items linked to replace_version from metriq submission
+        delete_submission_results(submission_id, replace_version)
 
     for new_qiskit_version in add_versions:
         # Run experiment and submit results to metriq
         # Set up tox env config
-        print(f"Starting setup for experiment run on qiskit version {new_qiskit_version}...")
+        print(f"Starting environment setup for qiskit version {new_qiskit_version}...")
         python_version = "3.8"
         env_name = "qiskit_v" + new_qiskit_version
         run_experiment_command = f"python {{toxinidir}}/src/{EXPERIMENT}.py"
