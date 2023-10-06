@@ -1,4 +1,4 @@
-name: Run benchmark experiments and submit results to metriq.info
+name: Check for new qiskit versions, run benchmark experiments and submit results to metriq.info
 
 on:
   schedule:
@@ -15,13 +15,18 @@ jobs:
       METRIQ_TOKEN: ${{ secrets.METRIQ_TOKEN}}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Setup repository on this workflow
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
+      
+      - name: Install and configure Github CLI
+        uses: cli/cli/setup@v2
+        with:
+          gh-version: 2
       
       - name: Install tox
         run: pip install tox 
@@ -29,22 +34,26 @@ jobs:
       - name: Run experiment steps in tox
         run: tox -ve py38
 
-      # TODO: Create Github Bot account
-      # - name: Configure Git with Bot Git Config
-      #   run: |
-      #     git config user.name "${{ secrets.BOT_USERNAME }}"
-      #     git config user.email "${{ secrets.BOT_EMAIL }}"
+      - name: Configure Git with Bot Git Config
+        run: |
+          git config user.name "${{ secrets.BOT_USERNAME }}"
+          git config user.email "${{ secrets.BOT_EMAIL }}"
 
-      # - name: Check for new CSV files and commit with Bot user
-      #   run: |
-      #     untracked_csv_files=$(find ./benchmarking/results/ -name '*.csv' -type f)
-      #     if [ -n "$untracked_csv_files" ]; then
-      #       git add $untracked_csv_files
-      #       git commit -m "Add new result files"
-      #       git push -u origin main
-      #     fi
-      #   env:
-      #     BOT_USERNAME: ${{ secrets.BOT_USERNAME }}
-      #     BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
-      #     BOT_PAT: ${{ secrets.BOT_PAT}}
+      - name: Check for updates on result files and open new PR with Bot user
+        run: |
+          untracked_csv_files=$(find ./benchmarking/results/ -name '*.csv' -type f)
+          deleted_csv_files=$(git diff --name-only HEAD@{1} HEAD | grep -E '^../results/.*\.csv')
+          if [ -n "$untracked_csv_files" ] || [ -n "deleted_csv_files"]; then
+            git checkout -b bot-branch
+            git add $untracked_csv_files
+            git rm $deleted_csv_files
+            git commit -m "Add new result files"
+            git push --set-upstream origin bot-branch
+            gh pr create --base main --head bot-branch --title "Add new result files"
+            git checkout main
+          fi
+        env:
+          BOT_USERNAME: ${{ secrets.BOT_USERNAME }}
+          BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
 
