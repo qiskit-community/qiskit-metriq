@@ -14,9 +14,12 @@ except ImportError:
   import qiskit
   VERSION = qiskit.__version__
 
+ARCHITECTURES = ["ibm_rochester", "rigetti_16q_aspen"]
+CONTENT_URL = "https://github.com/qiskit-community/qiskit-metriq"
+METRICS = ["Circuit depth", "Gate count"]
 METRIQ_TOKEN = os.getenv("METRIQ_TOKEN")
 RESULTS_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "results"))
-CONTENT_URL = "https://github.com/qiskit-community/qiskit-metriq"
+SUMMARY_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "processed_data_summary.json"))
 THUMBNAIL_URL = "https://avatars.githubusercontent.com/u/30696987?s=200&v=4"
 
 # Metriq API parameters and associated ids
@@ -25,6 +28,15 @@ PLATFORMS = {"64": "Rigetti 16Q Aspen-1 ", "69": "ibmq-rochester"}
 TAGS = ["quantum circuits", "compiler", "compilation", "ibm qiskit"]
 TASKS = {"25": "ex1_226.qasm", "26": "ex1_226.qasm (Aspen)", "27": "ex1_226.qasm (Rochester)"}
 SUBMISSIONS = {"595": TASKS["25"],"661": TASKS["26"], "662": TASKS["27"]}
+
+def get_substring_between_parentheses(input_str: str) -> str:
+  start = input_str.find("(")
+  end = input_str.find(")")
+  if start != -1 and end != -1:
+    substring = input_str[start +1: end]
+    return substring
+  else:
+    return None
 
 def get_id(input_list: dict, input_value: str) -> str:
   # Return key from value
@@ -66,7 +78,7 @@ def submit(client: MetriqClient, submission_id: str):
 def submit_all(client: MetriqClient, task_name: str, submission_id: str = None):
   if not submission_id:
     submission_id = create_new_submission(client,task_name)
-
+  
   # Process results
   filenames = os.listdir(RESULTS_PATH)
   for filename in filenames:
@@ -86,6 +98,10 @@ def create_new_submission(client: MetriqClient, task_name: str) -> str:
   submission_req.contentUrl = CONTENT_URL
   submission_req.thumbnailUrl = THUMBNAIL_URL
   submission_req.description = f"Qiskit compilation for {task_name} benchmark circuit"
+  submission_req.codeUrl = CONTENT_URL
+  platform_keyword = get_substring_between_parentheses(task_name)
+  platform_id = get_platform_id(platform_keyword)
+  submission_req.platform = platform_id
 
   submission_id = client.submission_add(submission_req)["id"]
   # Populate other submission parameters
@@ -96,19 +112,15 @@ def create_new_submission(client: MetriqClient, task_name: str) -> str:
   # Tags
   for tag in TAGS:
     client.submission_add_tag(submission_id, tag)
-  # TODO Update params below using the API - currently not supported
-  # submission.codeUrl
-  # submission.platform
   return submission_id
 
 def process_results(dataframe, client: MetriqClient, task_id: str, method_id: str, submission_id: str):
-  metrics = ["Circuit depth", "Gate count"]
-  for metric in metrics:
+  for metric in METRICS:
     result_item = ResultCreateRequest()
     result_item.task = task_id # Must be id
     result_item.method = method_id # Must be id
     result_item.metricName = metric
-    result_item.metricValue = str(round(dataframe[metric].mean())) # Must be a string
+    result_item.metricValue = str(round(dataframe[metric].mean(),3)) # Must be a string
     result_item.evaluatedAt = dataframe["Date"].iloc[0]
     result_item.isHigherBetter = "false"
 
@@ -118,9 +130,10 @@ def process_results(dataframe, client: MetriqClient, task_id: str, method_id: st
     platform_id = get_platform_id(platform_keyword)
     result_item.platform = platform_id # Must be id
 
-    # TODO: Update sample size - currently not supported
-    # sample_size = len(dataframe.index)
-    # result_item.sampleSize = sample_size # ERROR: object has no field "sampleSize"
+    sample_size = len(dataframe.index)
+    result_item.sampleSize = sample_size
+    std_err = dataframe[metric].sem()
+    result_item.standardError = str(round(std_err, 3)) # Must be a string
 
     # Get extra info and add to notes
     metric_std = dataframe[metric].std()
@@ -131,8 +144,68 @@ def process_results(dataframe, client: MetriqClient, task_id: str, method_id: st
 
     client.result_add(result_item, submission_id)
 
+def evaluate_metrics(qiskit_version: str) -> dict:
+  processed_summary = {}
+
+  # Process results and save to file
+  filenames = os.listdir(RESULTS_PATH)
+  for filename in filenames:
+    if qiskit_version in filename:
+      for arch in ARCHITECTURES:
+        if arch in filename:
+          file_path = os.path.join(RESULTS_PATH, f"{filename}")
+          df = pd.read_csv(file_path, sep='|')
+          obj_key = qiskit_version + "-" + arch
+          processed_summary[obj_key] = []
+          
+          for metric in METRICS:
+            col = df[metric]
+            mean = col.mean()
+            stdev = col.std()
+            stderr = col.sem()
+
+            processed_summary[obj_key].append(
+              {metric: 
+                {"ave": mean, 
+                "stdev": round(stdev,3), 
+                "stderr": round(stderr,3)}
+              })
+  return processed_summary
+
+def append_to_json_file(json_file_path: str, processed_info: dict, version: str):
+  try:
+    with open(json_file_path, "r") as f:
+      data = json.load(f)
+  except json.JSONDecodeError:
+      data = []
+
+  # Check if version exists in file
+  v_in_file = any(version in item for item in data)
+  
+  # Only write to file if version is not in file
+  if not v_in_file:
+    data.append(processed_info)
+    with open(json_file_path, "w") as f:
+      json.dump(data, f, indent=4)
+    print(f"Summary for version '{version}' added to file.")
+  else:
+    print(f"Summary for version '{version}' is already in file.")
+
+def create_processed_data_summary():
+  versions_info = get_qiskit_versions_info()
+  for info in versions_info:
+      qiskit_version = info["version"]
+      processed_summary = evaluate_metrics(qiskit_version)
+      append_to_json_file(SUMMARY_PATH, processed_summary, qiskit_version)
+
+# create_processed_data_summary()
+
+# Process data
+processed_summary = evaluate_metrics(VERSION)
+append_to_json_file(SUMMARY_PATH, processed_summary, VERSION)
+
+# Submit to Metriq.info
 submission_id = os.getenv("SUBMISSION_ID")
 print(f"Processing submission {submission_id}...")
 client = MetriqClient(token=METRIQ_TOKEN)
 submit(client, submission_id)
-
