@@ -16,15 +16,16 @@ def get_qiskit_version_from_result(result_item: dict) -> str:
   # Get substring after last colon
   return notes.rsplit(":", 1)[1]
 
-def get_submissions_update_info() -> {}:
-  # Fetch latest qiskit version
-  latest_qiskit_version = find_latest_version(get_qiskit_versions_list())
+def get_submissions_update_info(package_name: str) -> {}:
+  all_versions_info = get_qiskit_terra_versions_info() if "terra" in package_name else get_qiskit_versions_info()
+  # Fetch latest qiskit version from PyPI
+  latest_qiskit_version = find_latest_version(all_versions_info)
 
-  # Fetch metriq results
+  # Fetch results from metriq.info
   client = MetriqClient(token=METRIQ_TOKEN)
   submission_ids = list(SUBMISSIONS.keys())
 
-  # For each metriq submission, keep track of qiskit versions submitted
+  # For each metriq submission, keep track of qiskit versions already submitted
   qiskit_versions_submitted = {}
   for submission_id in submission_ids:
     results = get_submission_results(client, submission_id)
@@ -33,7 +34,7 @@ def get_submissions_update_info() -> {}:
       submissions.append(get_qiskit_version_from_result(res))
     qiskit_versions_submitted[submission_id] = submissions
 
-  submissions_update_info = {}
+  submissions_to_update = {}
 
   # Find new qiskit versions to be either added or replaced in metriq
   for key, value in qiskit_versions_submitted.items():
@@ -50,9 +51,9 @@ def get_submissions_update_info() -> {}:
       if same_minor(latest_qiskit_version, latest_submitted_version):
         versions_to_be_replaced.append(latest_submitted_version)  
 
-    submissions_update_info[key] = {"add": versions_to_be_added, "replace": versions_to_be_replaced}
+    submissions_to_update[key] = {"add": versions_to_be_added, "replace": versions_to_be_replaced}
   
-  return submissions_update_info
+  return submissions_to_update
 
 def delete_submission_results(submission_id: str, qiskit_version: str):
   client = MetriqClient(token=METRIQ_TOKEN)
@@ -64,7 +65,6 @@ def delete_submission_results(submission_id: str, qiskit_version: str):
     if qiskit_version in notes:
       result_id = res["id"]
       # Delete result from submission
-      print(f"Deleting qiskit version {qiskit_version} result from submission {submission_id}...")
+      # May need to refresh the API token before the call below
       client.http.delete(f"/result/{result_id}/")
-
 
