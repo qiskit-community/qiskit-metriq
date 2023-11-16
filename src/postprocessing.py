@@ -171,15 +171,14 @@ def append_to_json_file(json_file_path: str, processed_info: dict, version: str)
   try:
     with open(json_file_path, "r") as f:
       data = json.load(f)
+      # Convert the JSON data to a string
+      json_string = json.dumps(data)
   except json.JSONDecodeError:
       data = []
+      json_string = ""
 
-  # Check if version exists in file
-  # TODO: Debug this, it never finds a match even when there is one
-  v_in_file = any(version in item for item in data)
-  
   # Only write to file if version is not in file
-  if not v_in_file:
+  if version not in json_string:
     data.append(processed_info)
     with open(json_file_path, "w") as f:
       json.dump(data, f, indent=4)
@@ -197,13 +196,11 @@ def create_processed_data_summary():
 # create_processed_data_summary()
 
 # Process data
-# processed_summary = evaluate_metrics(VERSION)
-# append_to_json_file(SUMMARY_PATH, processed_summary, VERSION)
+processed_summary = evaluate_metrics(VERSION)
+append_to_json_file(SUMMARY_PATH, processed_summary, VERSION)
 
 # Submit to Metriq.info
-#submission_id = os.getenv("SUBMISSION_ID") # TODO: undo
-submission_id = "662"
-
+submission_id = os.getenv("SUBMISSION_ID")
 print(f"Processing submission {submission_id}...")
 client = MetriqClient(token=METRIQ_TOKEN)
 submit(client, submission_id)
