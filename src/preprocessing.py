@@ -17,9 +17,8 @@ def get_qiskit_version_from_result(result_item: dict) -> str:
   return notes.rsplit(":", 1)[1]
 
 def get_submissions_update_info(package_name: str) -> {}:
-  all_versions_info = get_qiskit_terra_versions_info() if "terra" in package_name else get_qiskit_versions_info()
   # Fetch latest qiskit version from PyPI
-  latest_qiskit_version = find_latest_version(all_versions_info)
+  latest_qiskit_version = find_latest_version(get_qiskit_versions_list(package_name))
 
   # Fetch results from metriq.info
   client = MetriqClient(token=METRIQ_TOKEN)

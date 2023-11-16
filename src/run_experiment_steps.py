@@ -1,7 +1,7 @@
 import os
 from preprocessing import get_submissions_update_info, delete_submission_results
 from env_setup import create_tox_config_file
-#from pprint import pp
+# from pprint import pp
 
 RESULTS_PATH = os.path.abspath(os.path.join(os.path.dirname( __file__ ),"..", "benchmarking", "results"))
 METRIQ_CLIENT_URL = "https://github.com/unitaryfund/metriq-client/tarball/development"
@@ -36,15 +36,12 @@ for key,value in submissions_to_be_updated.items():
         delete_submission_results(submission_id, replace_version)
 
     for new_qiskit_version in add_versions:
-        # Run experiment and submit results to metriq
-        
-        #TODO don't run the experiment again for the same qiskit version if a csv result file already exists
-        results_available = get_csv_files(new_qiskit_version)
-
-        # Set up tox env config
         print(f"Starting environment setup for qiskit version {new_qiskit_version}...")
+        
+        #Set up tox env config
         python_version = "3.8"
         env_name = "qiskit_v" + new_qiskit_version
+        results_available = get_csv_files(new_qiskit_version)
         run_experiment_command = f"python {{toxinidir}}/src/{EXPERIMENT}.py" if not results_available else ""
         install_metriq_client_command = f"pip install --upgrade {METRIQ_CLIENT_URL}"
         submit_data_command = f"python {{toxinidir}}/src/postprocessing.py"
