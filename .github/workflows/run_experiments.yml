@@ -27,7 +27,7 @@ jobs:
           python-version: 3.8
       
       - name: Install and configure Github CLI
-        uses: cli/cli/setup@v2
+        uses: cli/cli/setup@v2.39.1
         with:
           gh-version: 2
       
