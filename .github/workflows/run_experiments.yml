@@ -18,45 +18,59 @@ jobs:
       METRIQ_TOKEN: ${{ secrets.METRIQ_TOKEN}}
 
     steps:
-      - name: Setup repository on this workflow
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
-      
-      - name: Install and configure Github CLI
-        uses: cli/cli/setup@v2.39.1
-        with:
-          gh-version: 2
-      
+
       - name: Install tox
-        run: pip install tox 
+        run: pip install tox
 
       - name: Run experiment steps in tox
         run: tox -ve py38
+      
+        - name: Checkout repository
+          uses: actions/checkout@v4
 
+      - name: Check for new artifacts
+        id: artifacts-check
+        run: |
+        git diff --name-only --diff-filter=AD HEAD^ HEAD benchmarking/results/ | grep '\.csv$' > changed_csv_files.txt
+        if [[ $(cat changed_csv_files.txt | wc -1) -eq 0 ]]; then
+          echo "No result files to process"
+          echo "changed_csv_files=0" >> $GIHUB_ENV
+        else
+          echo "New result files found"
+          cat changed_csv_files.txt
+          echo "changed_csv_files=1" >> $GIHUB_ENV
+          NEW_BRANCH="automated-branch"
+          echo "NEW_BRANCH=$NEW_BRANCH" >> $GIHUB_ENV
+        fi
+      
       - name: Configure Git with Bot Git Config
+        if: env.changed_csv_files.txt == '1'
         run: |
           git config user.name "${{ secrets.BOT_USERNAME }}"
           git config user.email "${{ secrets.BOT_EMAIL }}"
-
-      - name: Check for updates on result files and open new PR with Bot user
+      
+      - name: Create new branch and commit changes
+        if: env.changed_csv_files.txt == '1'
         run: |
-          untracked_csv_files=$(find ./benchmarking/results/ -name '*.csv' -type f)
-          deleted_csv_files=$(git diff --name-only HEAD@{1} HEAD | grep -E '^../results/.*\.csv')
-          if [ -n "$untracked_csv_files" ] || [ -n "deleted_csv_files"]; then
-            git checkout -b bot-branch
-            git add $untracked_csv_files
-            git rm $deleted_csv_files
-            git commit -m "Add new result files"
-            git push --set-upstream origin bot-branch
-            gh pr create --base main --head bot-branch --title "Add new result files"
-            git checkout main
-          fi
-        env:
-          BOT_USERNAME: ${{ secrets.BOT_USERNAME }}
-          BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+        git checkout -b ${{ env.NEW_BRANCH }}
+        cd benchmarking/results
+        xargs -a ../../changed_csv_files.txt -I {} git add "{}" || true
+        cd ../../
+        git commit -m "Add new result files"
+        git push origin ${{ env.NEW_BRANCH }}
 
+      - name: Create new PR for new artifacts
+        if: env.changed_csv_files.txt == '1'
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_title: "Add new result files"
+          destination_branch: "main"
+          source_branch: ${{ env.NEW_BRANCH }}
