@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # Fetch at least 2 commits
 
       - name: Set up Python
         uses: actions/setup-python@v4
