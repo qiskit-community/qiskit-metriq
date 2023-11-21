@@ -1,17 +1,15 @@
 import os
 import requests
 import json
+import qiskit
 from datetime import datetime
 
 def get_installed_version():
     try:
         # Starting with qiskit v0.45, qiskit and qiskit-terra will have the same version
-        from qiskit import __version__
-        return __version__ # Yields qiskit-terra version
+        return qiskit.__version__
     except ImportError:
-        # Import from older terra versions
-        from qiskit import __qiskit_version__
-        return __qiskit_version__["qiskit-terra"]
+        return qiskit.__qiskit_version__["qiskit"]
 
 def get_qiskit_releases_data(package_name: str) -> dict:
     response = requests.get(f"https://pypi.org/pypi/{package_name}/json")
@@ -33,7 +31,6 @@ def get_qiskit_terra_versions_info() -> []:
     # Filter releases from 2020-03 (terra v0.13.x) to 2023-10 (terra v.0.25.x)
     return filter_by_date(data_items,[2020,3], [2023,10])
 
-#TODO: Add argument for qiskit or qiskit-terra and adjust line 38 accordingly
 def get_qiskit_versions_list(package_name: str) -> []:
     qiskit_versions_info = get_qiskit_terra_versions_info() if "terra" in package_name else get_qiskit_versions_info()
     versions_only = []

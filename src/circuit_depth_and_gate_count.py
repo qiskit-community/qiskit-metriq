@@ -1,8 +1,7 @@
 import os
 import pandas as pd
 from pyzx import routing
-from qiskit import QuantumCircuit
-from qiskit import transpile
+from qiskit import QuantumCircuit, transpile
 from qiskit.transpiler import CouplingMap, TranspilerError
 from qiskit_versions import *
 

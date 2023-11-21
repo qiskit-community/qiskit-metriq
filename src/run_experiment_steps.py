@@ -39,7 +39,7 @@ for key,value in submissions_to_be_updated.items():
         print(f"Starting environment setup for qiskit version {new_qiskit_version}...")
         
         #Set up tox env config
-        python_version = "3.8"
+        python_version = "3.11"
         env_name = "qiskit_v" + new_qiskit_version
         results_available = get_csv_files(new_qiskit_version)
         run_experiment_command = f"python {{toxinidir}}/src/{EXPERIMENT}.py" if not results_available else ""
