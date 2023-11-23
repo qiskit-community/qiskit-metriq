@@ -35,38 +35,45 @@ jobs:
         run: tox -ve py311
 
       - name: Check for new artifacts
-        id: artifacts-check
         run: |
-          git diff --name-only --diff-filter=AD HEAD^ HEAD benchmarking/results/ | grep '\.csv$' > changed_csv_files.txt
-          if [[ $(cat changed_csv_files.txt | wc -1) -eq 0 ]]; then
-            echo "No result files to process"
-            echo "changed_csv_files=0" >> $GIHUB_ENV
-          else
+          cd benchmarking/results
+          if git status --porcelain | grep -E "\.csv$" -q; then
             echo "New result files found"
-            cat changed_csv_files.txt
-            echo "changed_csv_files=1" >> $GIHUB_ENV
+            echo "changed_csv_files=1" >> $GITHUB_ENV
             NEW_BRANCH="automated-branch"
-            echo "NEW_BRANCH=$NEW_BRANCH" >> $GIHUB_ENV
+            echo "NEW_BRANCH=$NEW_BRANCH" >> $GITHUB_ENV
+          else
+            echo "No result files to process"
+            echo "changed_csv_files=0" >> $GITHUB_ENV
           fi
+          cd ../../
       
       - name: Configure Git with Bot Git Config
-        if: env.changed_csv_files.txt == '1'
+        if: env.changed_csv_files == '1'
         run: |
           git config user.name "${{ secrets.BOT_USERNAME }}"
           git config user.email "${{ secrets.BOT_EMAIL }}"
       
       - name: Create new branch and commit changes
-        if: env.changed_csv_files.txt == '1'
+        if: env.changed_csv_files == '1'
         run: |
           git checkout -b ${{ env.NEW_BRANCH }}
           cd benchmarking/results
-          xargs -a ../../changed_csv_files.txt -I {} git add "{}" || true
+
+          # List new and deleted CSV files and save output
+          git status --porcelain | awk '($1 ~ /^[?][?]/ || ($1 == "A" || $1 == "D")) && $2 ~ /\.csv$/{print$2}' > ../../csv_changes.txt
           cd ../../
+
+          # Loop through the saved list items and add them to staging
+          while IFS= read -r csv_file; do
+            git add "$csv_file"
+          done < csv_changes.txt
+
           git commit -m "Add new result files"
           git push origin ${{ env.NEW_BRANCH }}
 
       - name: Create new PR for new artifacts
-        if: env.changed_csv_files.txt == '1'
+        if: env.changed_csv_files == '1'
         uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
