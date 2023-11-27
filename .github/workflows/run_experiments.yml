@@ -1,9 +1,6 @@
-name: Check for new qiskit versions, run benchmark experiments and submit results to metriq.info
+name: Run benchmark experiments on new Qiskit versions and submit results to Metriq.info
 
 on:
-  push:
-    branches:
-      - 'client-update-results' #TODO: Remove this when done debugging CI
   schedule:
     - cron: '0 0 1 * *' # Schedule to run on the 1st day of each month at 12:00 AM UTC
 
