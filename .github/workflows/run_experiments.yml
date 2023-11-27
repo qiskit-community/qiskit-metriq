@@ -21,8 +21,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2 # Fetch at least 2 commits
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -32,7 +30,7 @@ jobs:
       - name: Install tox
         run: pip install tox
 
-      - name: Run experiment steps in tox
+      - name: Run experiments in tox
         run: tox -ve py311
 
       - name: Check for new artifacts
@@ -49,43 +47,15 @@ jobs:
           fi
           cd ../../
       
-      - name: Create new branch and commit changes
-        if: env.changed_csv_files == '1'
-        run: |
-          # Set bot's token
-          export BOT_ACCESS_TOKEN=${{ secrets.BOT_ACCESS_TOKEN }}
-
-          # Config Git with bot's credentials
-          git config user.name "${{ secrets.BOT_USERNAME }}"
-          git config user.email "${{ secrets.BOT_EMAIL }}"
-
-          # Create new branch
-          git checkout -b ${{ env.NEW_BRANCH }}
-          cd benchmarking/results
-
-          # List new and deleted CSV files and save output
-          git status --porcelain | awk '($1 ~ /^[?][?]/ || ($1 == "A" || $1 == "D")) && $2 ~ /\.csv$/{print$2}' > ../../csv_changes.txt
-          cd ../../
-
-          # Loop through the saved list items and add them to staging
-          while IFS= read -r csv_file; do
-            git add "$csv_file"
-          done < csv_changes.txt
-
-          # Commit and push changes
-          git commit -m "Add new result files during workflow"
-          git push origin ${{ env.NEW_BRANCH }}
-        env:
-          BOT_ACCESS_TOKEN: ${{ secrets.BOT_ACCESS_TOKEN }}
-
-      - name: Create new PR for new artifacts
+      - name: Create Pull Request for new artifacts
         if: env.changed_csv_files == '1'
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.BOT_ACCESS_TOKEN }}
-          title: "Add new result files"
-          source_branch: ${{ env.NEW_BRANCH }}
-          destination-branch: "main"
+          commit-message: Update results
+          title: Update results
+          base: main
+          branch: ${{ env.NEW_BRANCH }}
           delete-branch: true
           
 
