@@ -33,7 +33,7 @@ Compiled for the IBMQ Rochester architecture
 
 ## Requirements
 * [tox](https://pypi.org/project/tox/)
-* Python 3.8+
+* Python 3.11+
 
 ## Run locally
 ### To run a benchmark experiment using the current stable version of `Qiskit`:

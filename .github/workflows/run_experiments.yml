@@ -1,4 +1,4 @@
-name: Check for new qiskit versions, run benchmark experiments and submit results to metriq.info
+name: Run benchmark experiments on new Qiskit versions and submit results to Metriq.info
 
 on:
   schedule:
@@ -13,47 +13,46 @@ jobs:
 
     env:
       METRIQ_TOKEN: ${{ secrets.METRIQ_TOKEN}}
+      BOT_ACCESS_TOKEN: ${{ secrets.BOT_ACCESS_TOKEN }}
 
     steps:
-      - name: Setup repository on this workflow
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.8
-      
-      - name: Install and configure Github CLI
-        uses: cli/cli/setup@v2
-        with:
-          gh-version: 2
-      
+          python-version: 3.11
+
       - name: Install tox
-        run: pip install tox 
+        run: pip install tox
 
-      - name: Run experiment steps in tox
-        run: tox -ve py38
+      - name: Run experiments in tox
+        run: tox -ve py311
 
-      - name: Configure Git with Bot Git Config
+      - name: Check for new artifacts
         run: |
-          git config user.name "${{ secrets.BOT_USERNAME }}"
-          git config user.email "${{ secrets.BOT_EMAIL }}"
-
-      - name: Check for updates on result files and open new PR with Bot user
-        run: |
-          untracked_csv_files=$(find ./benchmarking/results/ -name '*.csv' -type f)
-          deleted_csv_files=$(git diff --name-only HEAD@{1} HEAD | grep -E '^../results/.*\.csv')
-          if [ -n "$untracked_csv_files" ] || [ -n "deleted_csv_files"]; then
-            git checkout -b bot-branch
-            git add $untracked_csv_files
-            git rm $deleted_csv_files
-            git commit -m "Add new result files"
-            git push --set-upstream origin bot-branch
-            gh pr create --base main --head bot-branch --title "Add new result files"
-            git checkout main
+          cd benchmarking/results
+          if git status --porcelain | grep -E "\.csv$" -q; then
+            echo "New result files found"
+            echo "changed_csv_files=1" >> $GITHUB_ENV
+            NEW_BRANCH="automated-branch"
+            echo "NEW_BRANCH=$NEW_BRANCH" >> $GITHUB_ENV
+          else
+            echo "No result files to process"
+            echo "changed_csv_files=0" >> $GITHUB_ENV
           fi
-        env:
-          BOT_USERNAME: ${{ secrets.BOT_USERNAME }}
-          BOT_EMAIL: ${{ secrets.BOT_EMAIL }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN}}
+          cd ../../
+      
+      - name: Create Pull Request for new artifacts
+        if: env.changed_csv_files == '1'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.BOT_ACCESS_TOKEN }}
+          commit-message: Update results
+          title: Update results
+          base: main
+          branch: ${{ env.NEW_BRANCH }}
+          delete-branch: true
+          
 

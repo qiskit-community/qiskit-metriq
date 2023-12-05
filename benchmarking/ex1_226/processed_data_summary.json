@@ -408,7 +408,7 @@
         ]
     },
     {
-        "0.44.1-ibm_rochester": [
+        "0.25.3-ibm_rochester": [
             {
                 "Circuit depth": {
                     "ave": 10.4,
@@ -424,7 +424,7 @@
                 }
             }
         ],
-        "0.44.1-rigetti_16q_aspen": [
+        "0.25.3-rigetti_16q_aspen": [
             {
                 "Circuit depth": {
                     "ave": 9.14,
@@ -437,6 +437,40 @@
                     "ave": 15.3,
                     "stdev": 2.787,
                     "stderr": 0.279
+                }
+            }
+        ]
+    },
+    {
+        "0.45.0-ibm_rochester": [
+            {
+                "Circuit depth": {
+                    "ave": 10.28,
+                    "stdev": 1.538,
+                    "stderr": 0.154
+                }
+            },
+            {
+                "Gate count": {
+                    "ave": 16.13,
+                    "stdev": 2.465,
+                    "stderr": 0.246
+                }
+            }
+        ],
+        "0.45.0-rigetti_16q_aspen": [
+            {
+                "Circuit depth": {
+                    "ave": 9.09,
+                    "stdev": 1.232,
+                    "stderr": 0.123
+                }
+            },
+            {
+                "Gate count": {
+                    "ave": 15.39,
+                    "stdev": 2.77,
+                    "stderr": 0.277
                 }
             }
         ]
