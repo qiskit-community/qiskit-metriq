@@ -1,26 +1,17 @@
-import pandas as pd
 import os
-import statistics
+import pandas as pd
 from pyzx import routing
-from qiskit import QuantumCircuit
-from qiskit import transpile
+from qiskit import QuantumCircuit, transpile
 from qiskit.transpiler import CouplingMap, TranspilerError
-from qiskit_versions import get_version_date
+from qiskit_versions import *
 
-try:
-  # Try to import qiskit version from 0.44.0 and above
-  from qiskit import __qiskit_version__
-  VERSION = __qiskit_version__["qiskit"]
-except ImportError:
-  # Import from older versions
-  import qiskit
-  VERSION = qiskit.__version__
-
+VERSION = get_installed_version()
+PACKAGE_NAME = "qiskit" if VERSION == compare_versions(VERSION, "0.25.3") else "qiskit-terra"
 SAMPLE_SIZE = 100
 ARCHITECTURES = ["ibm_rochester", "rigetti_16q_aspen"]
 OPTIMIZATION_LEVEL = 3
-DATE = get_version_date("qiskit", VERSION)
-METHOD = f"Qiskit {VERSION} compilation"
+DATE = get_version_date(PACKAGE_NAME, VERSION)
+METHOD = f"{PACKAGE_NAME} {VERSION} compilation"
 
 def run_experiment(qasm_id: str):
   print(f"\nRunning {METHOD} for circuit {qasm_id}\n")
@@ -48,7 +39,7 @@ def run_experiment(qasm_id: str):
     df.to_csv(output_path, sep="|")
 
     print(f"{arch}\n",
-          f"- Circuit depth - ave: {round(df['Circuit depth'].mean())} | stdev: {round(df['Circuit depth'].std(),3)}\n",
-          f"- Gate count - ave: {round(df['Gate count'].mean())} | stdev: {round(df['Gate count'].std(),3)}")
+          f"- Circuit depth - ave: {df['Circuit depth'].mean()} | stdev: {df['Circuit depth'].std()}\n",
+          f"- Gate count - ave: {df['Gate count'].mean()} | stdev: {df['Gate count'].std()}")
 
 run_experiment("ex1_226")

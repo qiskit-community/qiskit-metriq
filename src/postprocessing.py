@@ -1,19 +1,12 @@
 import os
+import json
 import pandas as pd
 from metriq import MetriqClient
 from metriq.models.result import ResultCreateRequest
-from metriq.models.submission import (Submission, SubmissionCreateRequest)
-from preprocessing import get_submission_results
-from qiskit_versions import compare_versions
-try:
-  # Try to import qiskit version from 0.44.0 and above
-  from qiskit import __qiskit_version__
-  VERSION = __qiskit_version__["qiskit"]
-except ImportError:
-  # Import from older versions
-  import qiskit
-  VERSION = qiskit.__version__
+from metriq.models.submission import SubmissionCreateRequest
+from qiskit_versions import *
 
+VERSION = get_installed_version()
 ARCHITECTURES = ["ibm_rochester", "rigetti_16q_aspen"]
 CONTENT_URL = "https://github.com/qiskit-community/qiskit-metriq"
 METRICS = ["Circuit depth", "Gate count"]
@@ -51,6 +44,7 @@ def get_platform_id(keywork: str) -> str:
   return None
 
 def files_to_be_processed (submission_id: str) -> []:
+  print("Processing results for Qiskit version ", VERSION)
   all_filenames = os.listdir(RESULTS_PATH)
   files_to_processed = []
   for filename in all_filenames:
@@ -130,17 +124,18 @@ def process_results(dataframe, client: MetriqClient, task_id: str, method_id: st
     platform_id = get_platform_id(platform_keyword)
     result_item.platform = platform_id # Must be id
 
-    sample_size = len(dataframe.index)
-    result_item.sampleSize = sample_size
-    std_err = dataframe[metric].sem()
-    result_item.standardError = str(round(std_err, 3)) # Must be a string
-
     # Get extra info and add to notes
     metric_std = dataframe[metric].std()
     opt_level = dataframe["Opt level"].iloc[0]
     version = dataframe["Method"].iloc[0].split(" ")[1] # Must be same as VERSION
-    package_name = "qiskit" if VERSION == compare_versions(VERSION, "0.25.0") else "qiskit-terra"
+    package_name = "qiskit" if VERSION == compare_versions(VERSION, "0.25.3") else "qiskit-terra"
     result_item.notes = f"Stdev: {round(metric_std,3)}, Optimization level:{opt_level}, {package_name} version:{version}"
+
+    # TODO: Need to add sample size and std err manually
+    # sample_size = len(dataframe.index)
+    # result_item.sampleSize = sample_size #ValueError: "ResultCreateRequest" object has no field "sampleSize"
+    # std_err = dataframe[metric].sem()
+    # result_item.standardError = str(round(std_err, 3)) # Must be a string #ValueError: "ResultCreateRequest" object has no field "standardError"
 
     client.result_add(result_item, submission_id)
 
@@ -176,14 +171,14 @@ def append_to_json_file(json_file_path: str, processed_info: dict, version: str)
   try:
     with open(json_file_path, "r") as f:
       data = json.load(f)
+      # Convert the JSON data to a string
+      json_string = json.dumps(data)
   except json.JSONDecodeError:
       data = []
+      json_string = ""
 
-  # Check if version exists in file
-  v_in_file = any(version in item for item in data)
-  
   # Only write to file if version is not in file
-  if not v_in_file:
+  if version not in json_string:
     data.append(processed_info)
     with open(json_file_path, "w") as f:
       json.dump(data, f, indent=4)
