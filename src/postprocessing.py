@@ -11,8 +11,6 @@ ARCHITECTURES = ["ibm_rochester", "rigetti_16q_aspen"]
 CONTENT_URL = "https://github.com/qiskit-community/qiskit-metriq"
 METRICS = ["Circuit depth", "Gate count"]
 METRIQ_TOKEN = os.getenv("METRIQ_TOKEN")
-RESULTS_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "results"))
-SUMMARY_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "processed_data_summary.json"))
 THUMBNAIL_URL = "https://avatars.githubusercontent.com/u/30696987?s=200&v=4"
 
 # Metriq API parameters and associated ids
@@ -21,6 +19,12 @@ PLATFORMS = {"64": "Rigetti 16Q Aspen-1 ", "69": "ibmq-rochester"}
 TAGS = ["quantum circuits", "compiler", "compilation", "ibm qiskit"]
 TASKS = {"25": "ex1_226.qasm", "26": "ex1_226.qasm (Aspen)", "27": "ex1_226.qasm (Rochester)"}
 SUBMISSIONS = {"595": TASKS["25"],"661": TASKS["26"], "662": TASKS["27"]}
+
+def get_results_path(experiment_name: str) -> str:
+  return os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..","benchmarking",experiment_name,"results"))
+
+def get_summary_path(experiment_name: str) -> str:
+  return os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..","benchmarking",experiment_name,"processed_data_summary.json"))
 
 def get_substring_between_parentheses(input_str: str) -> str:
   start = input_str.find("(")
@@ -43,9 +47,10 @@ def get_platform_id(keywork: str) -> str:
       return key
   return None
 
-def files_to_be_processed (submission_id: str) -> []:
+def files_to_be_processed (submission_id: str, experiment_name: str) -> []:
+  results_path = get_results_path(experiment_name)
   print("Processing results for Qiskit version ", VERSION)
-  all_filenames = os.listdir(RESULTS_PATH)
+  all_filenames = os.listdir(results_path)
   files_to_processed = []
   for filename in all_filenames:
     if VERSION in filename:
@@ -59,28 +64,30 @@ def files_to_be_processed (submission_id: str) -> []:
               files_to_processed.append(filename)
   return files_to_processed
 
-def submit(client: MetriqClient, submission_id: str):
-  filenames = files_to_be_processed(submission_id)
+def submit(client: MetriqClient, submission_id: str, experiment_name: str):
+  results_path = get_results_path(experiment_name)
+  filenames = files_to_be_processed(submission_id, experiment_name)
   for filename in filenames:
     # Process results and add them to existing submission
-    file_path = os.path.join(RESULTS_PATH, f"{filename}")
+    file_path = os.path.join(results_path, f"{filename}")
     df = pd.read_csv(file_path, sep='|')
     task_id = get_id(TASKS, SUBMISSIONS[submission_id])
     method_id = get_id(METHOD, "Qiskit compilation")
     process_results(df, client, task_id, method_id, submission_id)
 
-def submit_all(client: MetriqClient, task_name: str, submission_id: str = None):
+def submit_all(client: MetriqClient, task_name: str, submission_id: str = None, experiment_name: str= "ex1_226"):
   if not submission_id:
     submission_id = create_new_submission(client,task_name)
   
   # Process results
-  filenames = os.listdir(RESULTS_PATH)
+  results_path = get_results_path(experiment_name)
+  filenames = os.listdir(results_path)
   for filename in filenames:
     architectures = ["aspen", "rochester"]
     for arch in architectures:
       if arch in filename and arch in task_name.lower():
         print(f"*** Processing {arch} results from {filename}")
-        file_path = os.path.join(RESULTS_PATH, f"{filename}")
+        file_path = os.path.join(results_path, f"{filename}")
         df = pd.read_csv(file_path, sep='|')
         task_id = get_id(TASKS, task_name)
         method_id = get_id(METHOD, "Qiskit compilation")
@@ -139,16 +146,17 @@ def process_results(dataframe, client: MetriqClient, task_id: str, method_id: st
 
     client.result_add(result_item, submission_id)
 
-def evaluate_metrics(qiskit_version: str) -> dict:
+def evaluate_metrics(qiskit_version: str, experiment_name: str) -> dict:
   processed_summary = {}
 
   # Process results and save to file
-  filenames = os.listdir(RESULTS_PATH)
+  results_path = get_results_path(experiment_name)
+  filenames = os.listdir(results_path)
   for filename in filenames:
     if qiskit_version in filename:
       for arch in ARCHITECTURES:
         if arch in filename:
-          file_path = os.path.join(RESULTS_PATH, f"{filename}")
+          file_path = os.path.join(results_path, f"{filename}")
           df = pd.read_csv(file_path, sep='|')
           obj_key = qiskit_version + "-" + arch
           processed_summary[obj_key] = []
@@ -186,21 +194,32 @@ def append_to_json_file(json_file_path: str, processed_info: dict, version: str)
   else:
     print(f"Summary for version '{version}' is already in file.")
 
-def create_processed_data_summary():
+def create_processed_data_summary(experiment_name: str):
+  summary_file_path = get_summary_path(experiment_name)
   versions_info = get_qiskit_versions_info()
   for info in versions_info:
       qiskit_version = info["version"]
-      processed_summary = evaluate_metrics(qiskit_version)
-      append_to_json_file(SUMMARY_PATH, processed_summary, qiskit_version)
+      processed_summary = evaluate_metrics(qiskit_version, experiment_name)
+      append_to_json_file(summary_file_path, processed_summary, qiskit_version)
 
-# create_processed_data_summary()
+experiment_name = "ex1_226"
+# create_processed_data_summary(experiment_name)
 
 # Process data
-processed_summary = evaluate_metrics(VERSION)
-append_to_json_file(SUMMARY_PATH, processed_summary, VERSION)
+processed_summary = evaluate_metrics(VERSION, experiment_name)
+summary_file_path = get_summary_path(experiment_name)
+append_to_json_file(summary_file_path, processed_summary, VERSION)
 
 # Submit to Metriq.info
 submission_id = os.getenv("SUBMISSION_ID")
 print(f"Processing submission {submission_id}...")
 client = MetriqClient(token=METRIQ_TOKEN)
 submit(client, submission_id)
+
+"""
+TODO:
+# get experiment name from tasks
+# adjust constants for adder_8
+# remove default experiment_names in methods
+# create common file for constants shared across scripts (new issue)
+"""
