@@ -36,13 +36,13 @@ Compiled for the IBMQ Rochester architecture
 * Python 3.11+
 
 ## Run locally
-### To run a benchmark experiment using the current stable version of `Qiskit`:
+### To run a benchmark experiment using the latest version of `Qiskit`(RCs excluded):
 ```bash
-tox -e qiskit-compilation
+tox -e py311
 ```
 **Note:**
-To run a specific version of `qiskit-terra`, you can manually update it in the `tox.ini` file.
-Versions >=0.13,<=0.15 require numpy<1.20. You can run the tox environments `terra13`, `terra14` or `terra15` as:
+To run a specific version of `Qiskit`, you can manually update the `tox.ini` file with the required version.
+Versions >=0.13,<=0.15 require numpy<1.20 and python<=3.8. You can run the tox environments `terra13`, `terra14` or `terra15` as:
 ```bash
-tox -e qiskit-compilation-terra13
+tox -e py38-terra13
 ```
