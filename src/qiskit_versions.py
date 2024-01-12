@@ -81,10 +81,12 @@ def filter_by_date(data_items: dict, min_date: [], max_date: []) -> []:
     temp = {}
 
     for release, release_info in data_items:
-        # Skip RCs
-        if "rc" in release:
-            continue
 
+        # Skip RCs and pre-releases
+        if "rc" in release or "b" in release:
+            print("Skipping version ", release)
+            continue
+        
         date_str = release_info[0]["upload_time"]
         dt = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S")
         year = dt.year
