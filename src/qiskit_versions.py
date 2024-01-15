@@ -1,8 +1,13 @@
+import csv
 import os
-import requests
 import json
+import pprint
 import qiskit
+import requests
+from bs4 import BeautifulSoup
 from datetime import datetime
+
+RESULTS_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "results"))
 
 def get_installed_version():
     try:
@@ -139,6 +144,49 @@ def get_version_date(package_name: str, input_version:str) -> str:
             return date_time.split('T', 1)[0]
     return "Invalid version"
 
+def get_qiskit_version_map_history(url: str):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, "html.parser")
+    table = soup.find("table")
+    rows = table.find_all("tr")
+    version_map = {}
+
+    # Extract values from the first 2 columns (qiskit metapackage version, qiskit-terra)
+    for row in rows[1:]: # Skip the header row
+        columns = row.find_all("td")
+        if len(columns) >= 2:
+            # Key: qiskit-terra version, Value: qiskit metapackage version
+            key = columns[1].text.strip()
+            value = columns[0].text.strip()
+            version_map[key] = value
+    
+    return version_map
+
+def replace_filenames(folder_path: str):
+    if not os.path.exists(folder_path):
+        return
+    
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".csv"):
+            new_filename = filename.replace("qiskit-terra","qiskit")
+            os.rename(os.path.join(folder_path, filename), os.path.join(folder_path, new_filename))
+            print(f"Renamed '{filename}' to '{new_filename}'")
+
+# replace_filenames(RESULTS_PATH)
+url = "https://docs.quantum.ibm.com/api/qiskit/release-notes/0.44"
+version_history_map = get_qiskit_version_map_history(url)
+
+# Save version_history map to a csv file, package names as headers (qiskit metapackage is now qiskit)
+csv_file = "qiskit_version_history_map.csv"
+with open(csv_file, mode="w", newline="") as file:
+    csv_writer = csv.writer(file)
+    csv_writer.writerow(["qiskit-terra","qiskit"]) # Headers
+
+    for key,value in version_history_map.items():
+        csv_writer.writerow([key,value])
+print(f"Version history map written to {csv_file}")
+
+###
 # qiskit_info = get_qiskit_versions_info()
 # print("qiskit versions:", sep='\n')
 # print(*qiskit_info, sep='\n')
