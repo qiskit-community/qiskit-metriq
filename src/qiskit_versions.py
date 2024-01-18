@@ -4,8 +4,6 @@ import qiskit
 import requests
 from datetime import datetime
 
-RESULTS_PATH = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", "results"))
-
 def get_installed_version():
     try:
         # Starting with qiskit v0.45, qiskit and qiskit-terra will have the same version
