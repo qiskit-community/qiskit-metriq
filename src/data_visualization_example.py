@@ -44,15 +44,13 @@ version_col = "Qiskit version"
 aspen_combined_df[version_col] = aspen_combined_df.apply(lambda row : str(row[method_col]).split(' ')[1], axis = 1)
 rochester_combined_df[version_col] = rochester_combined_df.apply(lambda row : str(row[method_col]).split(' ')[1], axis = 1)
 
-# Enable grid lines
-sns.set(style="whitegrid")
-
 # Create boxplots for aspen architecture
 def create_boxplot(column: str, arch: str):
+  sns.set(style="whitegrid")
   plt.figure(figsize=(10,6))
   combined_df = aspen_combined_df if "aspen" in arch else rochester_combined_df
-  sns.boxplot(data=combined_df,x=version_col,y=column)
-  plt.title(f"{column} distribution of Qiskit compilation for {architectures[{arch}]} architecture")
+  sns.boxplot(data=combined_df,x=version_col,y=column,palette="pastel")
+  plt.title(f"{column} distribution of Qiskit compilation for {architectures[arch]} architecture")
   plt.xticks(rotation=90)
   plt.tight_layout()
   plt.show()
