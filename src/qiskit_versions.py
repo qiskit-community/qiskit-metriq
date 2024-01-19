@@ -139,11 +139,6 @@ def get_version_date(package_name: str, input_version:str) -> str:
             return date_time.split('T', 1)[0]
     return "Invalid version"
 
-def get_qiskit_version_map_history():
-    version_map = {}
-    
-    return version_map
-
 ###
 # qiskit_info = get_qiskit_versions_info()
 # print("qiskit versions:", sep='\n')
@@ -172,13 +167,3 @@ qiskit-terra versions:
 {'version': '0.24.2', 'date': '2023-07-19', 'python_version': '>=3.7'}
 {'version': '0.25.3', 'date': '2023-10-25', 'python_version': '>=3.8'}
 """
-
-###
-# version_history_map = get_qiskit_version_map_history()
-
-# def markdown_table_to_csv(md_file_path: str, csv_file_path: str):
-
-# Use qiskit version history map to rename all result filenames
-md_file_path = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "qiskit_releases.md"))
-csv_file_path = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "qiskit_releases.csv"))
-# markdown_table_to_csv(md_file_path, csv_file_path)
