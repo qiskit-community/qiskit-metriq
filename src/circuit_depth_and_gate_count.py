@@ -16,7 +16,7 @@ METHOD = f"{PACKAGE_NAME} {VERSION} compilation"
 def run_experiment(qasm_id: str):
   print(f"\nRunning {METHOD} for circuit {qasm_id}\n")
 
-  qasm_file_path = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking",f"{qasm_id}.qasm"))
+  qasm_file_path = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..","benchmarking",qasm_id,f"{qasm_id}.qasm"))
   circuit = QuantumCircuit.from_qasm_file(qasm_file_path)
   # Transpile for each architecture using pyzx
   for arch in ARCHITECTURES:
@@ -35,7 +35,7 @@ def run_experiment(qasm_id: str):
       results = [f"{qasm_id}.qasm", METHOD, DATE, OPTIMIZATION_LEVEL,arch,i,result.depth(),sum(result.count_ops().values())]
       df.loc[len(df)] = results
 
-    output_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ),"..","benchmarking","results",f"{qasm_id}-qiskit{VERSION}-{arch}.csv"))
+    output_path = os.path.abspath(os.path.join(os.path.dirname( __file__ ),"..","benchmarking",qasm_id,"results",f"{qasm_id}-qiskit{VERSION}-{arch}.csv"))
     df.to_csv(output_path, sep="|")
 
     print(f"{arch}\n",

@@ -125,11 +125,6 @@ def filter_by_date(data_items: dict, min_date: [], max_date: []) -> []:
 
     return filtered_releases
 
-def write_versions_to_file(versions: [], filename: str):
-    file_path = os.path.abspath(os.path.join( os.path.dirname( __file__ ),"..", "benchmarking", filename))
-    with open(file_path,"w") as file:
-        json.dump(versions, file, indent=4)
-
 def get_version_date(package_name: str, input_version:str) -> str:
     data_items = data_items = get_qiskit_releases_data(package_name)
     for release, release_info in data_items:
