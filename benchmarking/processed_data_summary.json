@@ -474,5 +474,39 @@
                 }
             }
         ]
+    },
+    {
+        "0.45.2-ibm_rochester": [
+            {
+                "Circuit depth": {
+                    "ave": 10.28,
+                    "stdev": 1.538,
+                    "stderr": 0.154
+                }
+            },
+            {
+                "Gate count": {
+                    "ave": 16.13,
+                    "stdev": 2.465,
+                    "stderr": 0.246
+                }
+            }
+        ],
+        "0.45.2-rigetti_16q_aspen": [
+            {
+                "Circuit depth": {
+                    "ave": 9.09,
+                    "stdev": 1.232,
+                    "stderr": 0.123
+                }
+            },
+            {
+                "Gate count": {
+                    "ave": 15.39,
+                    "stdev": 2.77,
+                    "stderr": 0.277
+                }
+            }
+        ]
     }
 ]
