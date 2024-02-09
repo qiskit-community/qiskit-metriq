@@ -187,7 +187,7 @@ def append_to_json_file(json_file_path: str, processed_info: dict, version: str)
     print(f"Summary for version '{version}' is already in file.")
 
 def create_processed_data_summary():
-  submitted_q_versions = ["0.45.0","0.44.3","0.42.1","0.39.5","0.37.2","0.36.2","0.34.2","0.30.1","0.26.1","0.23.5","0.20.1","19.4","0.18.0"]
+  submitted_q_versions = ["0.45.2","0.44.3","0.42.1","0.39.5","0.37.2","0.36.2","0.34.2","0.30.1","0.26.1","0.23.5","0.20.1","19.4","0.18.0"]
   submitted_q_versions.reverse()
   for qiskit_version in submitted_q_versions:
     processed_summary = evaluate_metrics(qiskit_version)
