@@ -442,7 +442,7 @@
         ]
     },
     {
-        "0.45.0-ibm_rochester": [
+        "0.45.2-ibm_rochester": [
             {
                 "Circuit depth": {
                     "ave": 10.28,
@@ -458,7 +458,7 @@
                 }
             }
         ],
-        "0.45.0-rigetti_16q_aspen": [
+        "0.45.2-rigetti_16q_aspen": [
             {
                 "Circuit depth": {
                     "ave": 9.09,
