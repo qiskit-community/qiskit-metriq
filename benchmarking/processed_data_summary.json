@@ -1,6 +1,6 @@
 [
     {
-        "0.13.0-ibm_rochester": [
+        "0.18.0-ibm_rochester": [
             {
                 "Circuit depth": {
                     "ave": 25.48,
@@ -16,7 +16,7 @@
                 }
             }
         ],
-        "0.13.0-rigetti_16q_aspen": [
+        "0.18.0-rigetti_16q_aspen": [
             {
                 "Circuit depth": {
                     "ave": 36.52,
@@ -34,7 +34,7 @@
         ]
     },
     {
-        "0.14.2-rigetti_16q_aspen": [
+        "0.19.4-rigetti_16q_aspen": [
             {
                 "Circuit depth": {
                     "ave": 17.53,
@@ -50,7 +50,7 @@
                 }
             }
         ],
-        "0.14.2-ibm_rochester": [
+        "0.19.4-ibm_rochester": [
             {
                 "Circuit depth": {
                     "ave": 12.92,
@@ -68,7 +68,7 @@
         ]
     },
     {
-        "0.15.2-ibm_rochester": [
+        "0.20.1-ibm_rochester": [
             {
                 "Circuit depth": {
                     "ave": 12.92,
@@ -84,7 +84,7 @@
                 }
             }
         ],
-        "0.15.2-rigetti_16q_aspen": [
+        "0.20.1-rigetti_16q_aspen": [
             {
                 "Circuit depth": {
                     "ave": 17.53,
@@ -102,7 +102,7 @@
         ]
     },
     {
-        "0.16.4-ibm_rochester": [
+        "0.23.5-ibm_rochester": [
             {
                 "Circuit depth": {
                     "ave": 12.92,
@@ -118,7 +118,7 @@
                 }
             }
         ],
-        "0.16.4-rigetti_16q_aspen": [
+        "0.23.5-rigetti_16q_aspen": [
             {
                 "Circuit depth": {
                     "ave": 17.53,
@@ -136,7 +136,7 @@
         ]
     },
     {
-        "0.17.4-rigetti_16q_aspen": [
+        "0.26.1-rigetti_16q_aspen": [
             {
                 "Circuit depth": {
                     "ave": 17.53,
@@ -152,7 +152,7 @@
                 }
             }
         ],
-        "0.17.4-ibm_rochester": [
+        "0.26.1-ibm_rochester": [
             {
                 "Circuit depth": {
                     "ave": 12.92,
@@ -170,7 +170,7 @@
         ]
     },
     {
-        "0.18.3-ibm_rochester": [
+        "0.30.1-ibm_rochester": [
             {
                 "Circuit depth": {
                     "ave": 12.92,
@@ -186,7 +186,7 @@
                 }
             }
         ],
-        "0.18.3-rigetti_16q_aspen": [
+        "0.30.1-rigetti_16q_aspen": [
             {
                 "Circuit depth": {
                     "ave": 17.53,
@@ -204,7 +204,7 @@
         ]
     },
     {
-        "0.19.2-ibm_rochester": [
+        "0.34.2-ibm_rochester": [
             {
                 "Circuit depth": {
                     "ave": 11.33,
@@ -220,7 +220,7 @@
                 }
             }
         ],
-        "0.19.2-rigetti_16q_aspen": [
+        "0.34.2-rigetti_16q_aspen": [
             {
                 "Circuit depth": {
                     "ave": 10.51,
@@ -238,7 +238,7 @@
         ]
     },
     {
-        "0.20.2-ibm_rochester": [
+        "0.36.2-ibm_rochester": [
             {
                 "Circuit depth": {
                     "ave": 11.33,
@@ -254,7 +254,7 @@
                 }
             }
         ],
-        "0.20.2-rigetti_16q_aspen": [
+        "0.36.2-rigetti_16q_aspen": [
             {
                 "Circuit depth": {
                     "ave": 10.51,
@@ -272,7 +272,7 @@
         ]
     },
     {
-        "0.21.2-rigetti_16q_aspen": [
+        "0.37.2-rigetti_16q_aspen": [
             {
                 "Circuit depth": {
                     "ave": 10.51,
@@ -288,7 +288,7 @@
                 }
             }
         ],
-        "0.21.2-ibm_rochester": [
+        "0.37.2-ibm_rochester": [
             {
                 "Circuit depth": {
                     "ave": 11.33,
@@ -306,7 +306,7 @@
         ]
     },
     {
-        "0.22.4-rigetti_16q_aspen": [
+        "0.39.5-rigetti_16q_aspen": [
             {
                 "Circuit depth": {
                     "ave": 10.39,
@@ -322,7 +322,7 @@
                 }
             }
         ],
-        "0.22.4-ibm_rochester": [
+        "0.39.5-ibm_rochester": [
             {
                 "Circuit depth": {
                     "ave": 11.28,
@@ -340,7 +340,7 @@
         ]
     },
     {
-        "0.23.3-rigetti_16q_aspen": [
+        "0.42.1-rigetti_16q_aspen": [
             {
                 "Circuit depth": {
                     "ave": 9.12,
@@ -356,7 +356,7 @@
                 }
             }
         ],
-        "0.23.3-ibm_rochester": [
+        "0.42.1-ibm_rochester": [
             {
                 "Circuit depth": {
                     "ave": 10.61,
@@ -374,7 +374,7 @@
         ]
     },
     {
-        "0.24.2-rigetti_16q_aspen": [
+        "0.43.3-rigetti_16q_aspen": [
             {
                 "Circuit depth": {
                     "ave": 9.14,
@@ -390,7 +390,7 @@
                 }
             }
         ],
-        "0.24.2-ibm_rochester": [
+        "0.43.3-ibm_rochester": [
             {
                 "Circuit depth": {
                     "ave": 10.4,
@@ -408,7 +408,7 @@
         ]
     },
     {
-        "0.25.3-ibm_rochester": [
+        "0.44.3-ibm_rochester": [
             {
                 "Circuit depth": {
                     "ave": 10.4,
@@ -424,7 +424,7 @@
                 }
             }
         ],
-        "0.25.3-rigetti_16q_aspen": [
+        "0.44.3-rigetti_16q_aspen": [
             {
                 "Circuit depth": {
                     "ave": 9.14,

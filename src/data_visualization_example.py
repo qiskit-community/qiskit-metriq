@@ -31,7 +31,7 @@ rochester_combined_df = pd.concat(rochester_dataframes, ignore_index=True)
 
 # Get data columns for plotting chart
 date_col = "Date"
-method_col = "Method"
+method_col = "Method" # Includes qiskit version info
 circuit_depth_col = "Circuit depth"
 gate_count_col = "Gate count"
 
@@ -44,40 +44,20 @@ version_col = "Qiskit version"
 aspen_combined_df[version_col] = aspen_combined_df.apply(lambda row : str(row[method_col]).split(' ')[1], axis = 1)
 rochester_combined_df[version_col] = rochester_combined_df.apply(lambda row : str(row[method_col]).split(' ')[1], axis = 1)
 
-# Enable grid lines
-sns.set(style="whitegrid")
-
 # Create boxplots for aspen architecture
-# Circuit depth
-plt.figure(figsize=(10,6))
-sns.boxplot(data=aspen_combined_df,x=version_col,y=circuit_depth_col)
-plt.title(f"{circuit_depth_col} distribution of Qiskit compilation for {architectures['aspen']}")
-plt.xticks(rotation=90)
-plt.tight_layout()
-plt.show()
-# Gate count
-plt.figure(figsize=(10,6))
-sns.boxplot(data=aspen_combined_df,x=version_col,y=gate_count_col)
-plt.title(f"{gate_count_col} distribution of Qiskit compilation for {architectures['aspen']}")
-plt.xticks(rotation=90)
-plt.tight_layout()
-plt.show()
+def create_boxplot(column: str, arch: str):
+  sns.set(style="whitegrid")
+  plt.figure(figsize=(10,6))
+  combined_df = aspen_combined_df if "aspen" in arch else rochester_combined_df
+  sns.boxplot(data=combined_df,x=version_col,y=column,palette="pastel")
+  plt.title(f"{column} distribution of Qiskit compilation for {architectures[arch]} architecture")
+  plt.xticks(rotation=90)
+  plt.tight_layout()
+  plt.show()
 
-# Create boxplots for rochester architecture
-# Circuit depth
-plt.figure(figsize=(10,6))
-sns.boxplot(data=rochester_combined_df,x=version_col,y=circuit_depth_col)
-plt.title(f"{circuit_depth_col} distribution of Qiskit compilation for {architectures['rochester']}")
-plt.xticks(rotation=90)
-plt.tight_layout()
-plt.show()
-# Gate count
-plt.figure(figsize=(10,6))
-sns.boxplot(data=rochester_combined_df,x=version_col,y=gate_count_col)
-plt.title(f"{gate_count_col} distribution of Qiskit compilation for {architectures['rochester']}")
-plt.xticks(rotation=90)
-plt.tight_layout()
-plt.show()
+for arch in architectures:
+  create_boxplot(circuit_depth_col, arch)
+  create_boxplot(gate_count_col, arch)
 
 
 

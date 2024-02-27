@@ -1,7 +1,7 @@
 import os
-import requests
 import json
 import qiskit
+import requests
 from datetime import datetime
 
 def get_installed_version():
@@ -139,6 +139,7 @@ def get_version_date(package_name: str, input_version:str) -> str:
             return date_time.split('T', 1)[0]
     return "Invalid version"
 
+###
 # qiskit_info = get_qiskit_versions_info()
 # print("qiskit versions:", sep='\n')
 # print(*qiskit_info, sep='\n')
