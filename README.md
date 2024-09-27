@@ -46,3 +46,8 @@ Versions >=0.13,<=0.15 require numpy<1.20 and python<=3.8. You can run the tox e
 ```bash
 tox -e py38-terra13
 ```
+
+## Contributing
+To contribute to Qiskit Metriq, please refer to our [contribution guidelines](CONTRIBUTING.md). By contributing, you are expected to agree and follow Qiskit's [code of conduct](CODE_OF_CONDUCT.md).
+
+For requests and bug reports, please open an [issue](https://github.com/qiskit-community/qiskit-metriq/issues/new) with a detailed description.
