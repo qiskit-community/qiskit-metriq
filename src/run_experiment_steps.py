@@ -1,6 +1,7 @@
 import os
 from preprocessing import get_submissions_update_info, delete_submission_results
 from env_setup import create_tox_config_file
+import subprocess
 # from pprint import pp
 
 RESULTS_PATH = os.path.abspath(os.path.join(os.path.dirname( __file__ ),"..", "benchmarking", "results"))
@@ -52,4 +53,12 @@ for key,value in submissions_to_be_updated.items():
         # Run tox with new config
         print(f"Running experiment for qiskit version {new_qiskit_version}...")
         run_tox_command = "tox -vre " + env_name
-        os.system(run_tox_command)
+        try:
+            #Use subprocess.run with check=True
+            subprocess.run(run_tox_command,shell=True,check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Tox command failed for environment {env_name} with exit code {e.returncode}", file=sys.stderr)
+            #Importing  sys so the script exit with a failure code 
+            import sys
+            sys.exit(1)
+            
